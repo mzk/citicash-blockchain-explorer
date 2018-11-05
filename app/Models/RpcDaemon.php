@@ -202,8 +202,8 @@ class RpcDaemon
 		//$response = $this->client->get($path, $options);
 		//$responseJson = Json::decode($response->getBody()->getContents());
 
-		$curl = curl_init();
-		curl_setopt_array($curl, [
+		$curl = \curl_init();
+		\curl_setopt_array($curl, [
 			\CURLOPT_PORT => $this->port,
 			\CURLOPT_URL => $this->host . $path,
 			\CURLOPT_RETURNTRANSFER => true,
@@ -215,16 +215,51 @@ class RpcDaemon
 			\CURLOPT_POSTFIELDS => $options['body'],
 		]);
 
-		$response = curl_exec($curl);
-		$err = curl_error($curl);
+		$response = \curl_exec($curl);
+		$err = \curl_error($curl);
 
-		curl_close($curl);
+		\curl_close($curl);
 
-		if (isset($err)) {
+		if ($err !== '') {
 			throw new BadRequestException($err);
 		}
 
 		$responseJson = Json::decode($response);
+
+		if (isset($responseJson->error) && isset($responseJson->error->message)) {
+			throw new BadRequestException($responseJson->error->message);
+		}
+
+		return $responseJson;
+	}
+
+	/**
+	 * @param string $path
+	 * @param mixed[] $body
+	 * @return stdClass
+	 * @throws BadRequestException
+	 */
+	protected function getResponseModern(string $path, array $body): stdClass
+	{
+		$options = [
+			'body' => Json::encode($body),
+			'debug' => false,
+			'allow_redirects' => false,
+			'synchronous' => false,
+			//'version' => '2.0', fail on aws
+			'curl.options' => [
+				\CURLOPT_RETURNTRANSFER => true,
+				\CURLOPT_ENCODING => '',
+				\CURLOPT_MAXREDIRS => 10,
+				\CURLOPT_TIMEOUT => 30,
+				\CURLOPT_HTTP_VERSION => \CURL_HTTP_VERSION_1_1,
+				\CURLOPT_CUSTOMREQUEST => 'GET',
+				\CURLOPT_POSTFIELDS => $body,
+			],
+		];
+
+		$response = $this->client->get($path, $options);
+		$responseJson = Json::decode($response->getBody()->getContents());
 
 		if (isset($responseJson->error) && isset($responseJson->error->message)) {
 			throw new BadRequestException($responseJson->error->message);
