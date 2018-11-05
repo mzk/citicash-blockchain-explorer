@@ -150,7 +150,6 @@ class BlockData
 
 	public static function fromResponse(stdClass $response): BlockData
 	{
-		//dump($response);
 		$header = $response->result->block_header;
 
 		$blockData = new BlockData();
