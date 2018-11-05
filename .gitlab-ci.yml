@@ -70,8 +70,7 @@ production:
             sudo rm -rf var/temp/cache/ var/tempcli/cache/ &&
             composer install --prefer-dist --no-dev &&
             composer dump-autoload --optimize --no-dev &&
-            redis-cli -h ${SSH_PRODUCTION_REDIS_SERVER} -n 1 flushdb &&
-            development=true php app/console orm:schema-tool:update --dump-sql"
+            redis-cli -h ${SSH_PRODUCTION_REDIS_SERVER} -n 1 flushdb"
         - echo "deploy to production succesfully completed!"
         - curl --request POST --header 'Content-Type:application/json' --data "{\"icon_emoji\":\":avocado:\",\"text\":\"new realease PRODUCTION https://blockchain-explorer.citicash.io, hash ${CI_COMMIT_SHA}, message ${CI_COMMIT_TITLE}\"}" ${WEBHOOK_URL}
   environment:
