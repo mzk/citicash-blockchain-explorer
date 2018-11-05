@@ -200,6 +200,9 @@ class RpcDaemon
 			],
 		];
 
+		//$response = $this->client->get($path, $options);
+		//$responseJson = Json::decode($response->getBody()->getContents());
+
 		$curl = curl_init();
 		curl_setopt_array($curl, [
 			CURLOPT_PORT => $this->port,
@@ -222,10 +225,7 @@ class RpcDaemon
 			throw new BadRequestException($err);
 		}
 
-		return Json::decode($response);
-
-		$response = $this->client->get($path, $options);
-		$responseJson = Json::decode($response->getBody()->getContents());
+		$responseJson = Json::decode($response);
 
 		if (isset($responseJson->error) && isset($responseJson->error->message)) {
 			throw new BadRequestException($responseJson->error->message);
