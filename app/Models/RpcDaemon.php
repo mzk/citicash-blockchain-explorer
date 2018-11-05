@@ -220,7 +220,7 @@ class RpcDaemon
 
 		curl_close($curl);
 
-		if ($err) {
+		if (isset($err)) {
 			throw new BadRequestException($err);
 		}
 
