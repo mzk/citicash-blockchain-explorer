@@ -65,8 +65,8 @@ production:
    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
   script:
     - composer install --prefer-dist --no-dev
-    - rsync -rvvazhP --delete --filter="merge .rsync-filter.conf" ./ ${SSH_PRODUCTION_PRIVATE_KEY}:/var/www/blockchain-explorer
-    - ssh ${SSH_PRODUCTION_PRIVATE_KEY} "cd /var/www/blockchain-explorer/ &&
+    - rsync -rvvazhP --delete --filter="merge .rsync-filter.conf" ./ ${SSH_PRODUCTION_SERVER}:/var/www/blockchain-explorer
+    - ssh ${SSH_PRODUCTION_SERVER} "cd /var/www/blockchain-explorer/ &&
             sudo rm -rf var/temp/cache/ var/tempcli/cache/ &&
             composer install --prefer-dist --no-dev &&
             composer dump-autoload --optimize --no-dev &&
