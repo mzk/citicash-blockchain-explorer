@@ -4,11 +4,10 @@ before_script:
   - php -v
 
 after_script:
-
+  - if [ -f var/log/*.log ]; then  cat var/log/*.log; fi
 stages:
   - build
   - deploy
-
 variables:
   #CI_DEBUG_TRACE: "true"
 
@@ -16,8 +15,8 @@ job1:
   stage: build
   script:
     - pwd
-    - composer require --dev roave/security-advisories:dev-master
     - composer install
+    - composer require --dev roave/security-advisories:dev-master
     - docker/docker.sh private:travis:before_script
     - cp app/config/config.local.dist.neon app/config/config.local.neon
     - rm -rf var/tempcli/cache
@@ -25,6 +24,7 @@ job1:
 #    - development=true php app/console orm:schema-tool:drop --force
 #    - development=true php app/console orm:schema-tool:update --force
     - docker/docker.sh private:test-coding-style
+
     - echo "job1 succesfully completed!"
   tags:
     - citicash
