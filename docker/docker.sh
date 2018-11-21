@@ -112,10 +112,10 @@ then
     echo_blue "nette code checker"
     php vendor/code-checker/code-checker -l -f --short-arrays --strict-types -d app || { out=1; }
     php vendor/code-checker/code-checker -l -f --short-arrays --strict-types -d tests || { out=1; }
-    echo_blue "phpstan"
+    echo_blue "php -c php.ini vendor/coding-style-checkers/vendor/bin/phpstan analyse -l 7 -c phpstan.neon app tests "
     rm -rf vendor/php-code-checker/vendor/phpstan/tmp/cache
     vendor/coding-style-checkers/vendor/bin/phpstan analyse -l 7 -c phpstan.neon app tests || { out=1; }
-    ./vendor/bin/tester -C -j 4 -C tests || { out=1; }
+    ./vendor/bin/tester -c php.ini -j 4 -C tests || { out=1; }
     exit $out
 fi
 
