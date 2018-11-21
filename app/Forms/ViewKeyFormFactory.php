@@ -18,7 +18,7 @@ class ViewKeyFormFactory
 		$this->formFactory = $formFactory;
 	}
 
-	public function create(callable $onSuccess, callable $onClear): Form
+	public function create(callable $onClear): Form
 	{
 		$form = $this->formFactory->create();
 		$form->getElementPrototype()
@@ -28,12 +28,11 @@ class ViewKeyFormFactory
 		$form->addSubmit('send', 'Send');
 		$form->addSubmit('reset', 'Reset');
 
-		$form->onSuccess[] = function (Form $form) use ($onSuccess, $onClear): void {
+		$form->onSuccess[] = function (Form $form) use ($onClear): void {
 			$submitterControl = $form->isSubmitted();
 			if ($submitterControl instanceof ISubmitterControl && $submitterControl->getValue() === 'Reset') {
 				$onClear();
 			}
-			$onSuccess();
 		};
 
 		return $form;
