@@ -127,4 +127,10 @@ class HomepagePresenter extends BasePresenter
 
 		$this->sendJson($response);
 	}
+
+	protected function afterRender(): void
+	{
+		\bdump($this->rpcDaemon->getRequestsCount(), 'requests count:');
+		parent::afterRender();
+	}
 }
