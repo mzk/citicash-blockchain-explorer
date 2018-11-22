@@ -47,10 +47,6 @@ class RpcDaemon
 				'handler' => $stack,
 			]
 		);
-		$this->curl = \curl_init();
-		if ($this->curl === false || $this->curl === null) {
-			throw new InvalidStateException('Failed curl_init');
-		}
 	}
 
 	public function getInfo(): InfoData
@@ -192,6 +188,16 @@ class RpcDaemon
 	 */
 	private function getResponse(string $path, array $body): stdClass
 	{
+		if ($this->curl === null) {
+			$this->curl = \curl_init();
+		}
+
+		if ($this->curl === false) {
+			throw new InvalidStateException('Failed curl_init');
+		}
+
+		$curl = $this->curl;
+
 		$options = [
 			'body' => Json::encode($body),
 			'debug' => false,
@@ -208,8 +214,6 @@ class RpcDaemon
 				\CURLOPT_POSTFIELDS => $body,
 			],
 		];
-
-		$curl = $this->curl;
 
 		\curl_setopt_array($curl, [
 			\CURLOPT_PORT => $this->port,
