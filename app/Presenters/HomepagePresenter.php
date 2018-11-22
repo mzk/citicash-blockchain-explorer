@@ -105,15 +105,11 @@ class HomepagePresenter extends BasePresenter
 
 	public function createComponentViewKeyForm(): Form
 	{
-		$onSuccess = function (): void {
-			$this->flashMessage('Unlocked by View Key');
-		};
-
 		$onClear = function (): void {
 			$this->redirect('this');
 		};
 
-		return $this->viewKeyFormFactory->create($onSuccess, $onClear);
+		return $this->viewKeyFormFactory->create($onClear);
 	}
 
 	public function renderInfo(): JsonResponse
