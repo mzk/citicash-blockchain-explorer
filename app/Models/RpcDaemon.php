@@ -194,8 +194,9 @@ class RpcDaemon
 	private function getResponse(string $path, array $body): stdClass
 	{
 		$this->requestsCount++;
+
 		return $this->getResponseOld($path, $body);
-//		return $this->getResponseModern($path, $body);
+		//return $this->getResponseModern($path, $body);
 	}
 
 	/**
@@ -275,19 +276,19 @@ class RpcDaemon
 			'synchronous' => false,
 			//'version' => '2.0', fail on aws
 			'curl.options' => [
-				\CURLOPT_PORT => $this->port,
-				\CURLOPT_URL => $this->host . $path,
 				\CURLOPT_RETURNTRANSFER => true,
 				\CURLOPT_ENCODING => '',
-				\CURLOPT_MAXREDIRS => 10,
+				\CURLOPT_MAXREDIRS => 0,
 				\CURLOPT_TIMEOUT => 30,
 				\CURLOPT_HTTP_VERSION => \CURL_HTTP_VERSION_1_1,
 				\CURLOPT_CUSTOMREQUEST => 'GET',
 				\CURLOPT_POSTFIELDS => $body,
+				\CURLOPT_FORBID_REUSE => false,
+				\CURLOPT_FRESH_CONNECT => false,
 			],
 		];
 
-		$response = $this->client->get($path, $options);
+		$response = $this->client->request('GET', $path, $options);
 		$responseJson = Json::decode($response->getBody()->getContents());
 
 		if (isset($responseJson->error) && isset($responseJson->error->message)) {
