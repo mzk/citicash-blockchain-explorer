@@ -204,6 +204,7 @@ class RpcDaemon
 	 * @param mixed[] $body
 	 * @return stdClass
 	 * @throws BadRequestException
+	 * @throws InvalidStateException
 	 */
 	protected function getResponseOld(string $path, array $body): stdClass
 	{
@@ -211,7 +212,7 @@ class RpcDaemon
 			$this->curl = \curl_init();
 		}
 
-		if ($this->curl === false) {
+		if (\is_resource($this->curl) === false) {
 			throw new InvalidStateException('Failed curl_init');
 		}
 

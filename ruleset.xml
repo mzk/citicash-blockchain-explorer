@@ -15,6 +15,7 @@
 		<exclude name="SlevomatCodingStandard.ControlStructures.EarlyExit.EarlyExitNotUsed"/>
 		<exclude name="SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint"/>
 		<exclude name="SlevomatCodingStandard.Operators.DisallowIncrementAndDecrementOperators.DisallowedPostIncrementOperator"/>
+		<exclude name="SlevomatCodingStandard.Operators.DisallowIncrementAndDecrementOperators.DisallowedPreIncrementOperator"/>
 		<exclude name="SlevomatCodingStandard.ControlStructures.NewWithoutParentheses.UselessParentheses"/>
 		<exclude name="SlevomatCodingStandard.Functions.StaticClosure.ClosureNotStatic"/>
 		<exclude name="SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter"/>
