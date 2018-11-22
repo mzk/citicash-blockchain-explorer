@@ -230,8 +230,6 @@ class RpcDaemon
 		$response = \curl_exec($curl);
 		$err = \curl_error($curl);
 
-		//\curl_close($curl);
-
 		if ($err !== '') {
 			throw new BadRequestException($err);
 		}
@@ -278,5 +276,10 @@ class RpcDaemon
 		}
 
 		return $responseJson;
+	}
+
+	public function __destruct()
+	{
+		\curl_close($this->curl);
 	}
 }
