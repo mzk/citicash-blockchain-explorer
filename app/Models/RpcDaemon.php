@@ -189,6 +189,7 @@ class RpcDaemon
 	private function getResponse(string $path, array $body): stdClass
 	{
 		return $this->getResponseOld($path, $body);
+//		return $this->getResponseModern($path, $body);
 	}
 
 	/**
@@ -197,7 +198,7 @@ class RpcDaemon
 	 * @return stdClass
 	 * @throws BadRequestException
 	 */
-	private function getResponseOld(string $path, array $body): stdClass
+	protected function getResponseOld(string $path, array $body): stdClass
 	{
 		if ($this->curl === null) {
 			$this->curl = \curl_init();
@@ -209,34 +210,27 @@ class RpcDaemon
 
 		$curl = $this->curl;
 
+		$body = Json::encode($body);
 		$options = [
-			'body' => Json::encode($body),
+			'body' => $body,
 			'debug' => false,
 			'allow_redirects' => false,
 			'synchronous' => false,
 			//'version' => '2.0', fail on aws
 			'curl.options' => [
+				\CURLOPT_PORT => $this->port,
+				\CURLOPT_URL => $this->host . $path,
 				\CURLOPT_RETURNTRANSFER => true,
 				\CURLOPT_ENCODING => '',
-				\CURLOPT_MAXREDIRS => 10,
+				\CURLOPT_MAXREDIRS => 0,
 				\CURLOPT_TIMEOUT => 30,
-				\CURLOPT_HTTP_VERSION => \CURL_HTTP_VERSION_1_1,
+				\CURLOPT_HTTP_VERSION => \CURL_HTTP_VERSION_2,
 				\CURLOPT_CUSTOMREQUEST => 'GET',
 				\CURLOPT_POSTFIELDS => $body,
 			],
 		];
 
-		\curl_setopt_array($curl, [
-			\CURLOPT_PORT => $this->port,
-			\CURLOPT_URL => $this->host . $path,
-			\CURLOPT_RETURNTRANSFER => true,
-			\CURLOPT_ENCODING => '',
-			\CURLOPT_MAXREDIRS => 10,
-			\CURLOPT_TIMEOUT => 30,
-			\CURLOPT_HTTP_VERSION => \CURL_HTTP_VERSION_1_1,
-			\CURLOPT_CUSTOMREQUEST => 'GET',
-			\CURLOPT_POSTFIELDS => $options['body'],
-		]);
+		\curl_setopt_array($curl, $options['curl.options']);
 
 		$response = \curl_exec($curl);
 		$err = \curl_error($curl);
@@ -262,13 +256,16 @@ class RpcDaemon
 	 */
 	protected function getResponseModern(string $path, array $body): stdClass
 	{
+		$body = Json::encode($body);
 		$options = [
-			'body' => Json::encode($body),
+			'body' => $body,
 			'debug' => false,
 			'allow_redirects' => false,
 			'synchronous' => false,
 			//'version' => '2.0', fail on aws
 			'curl.options' => [
+				\CURLOPT_PORT => $this->port,
+				\CURLOPT_URL => $this->host . $path,
 				\CURLOPT_RETURNTRANSFER => true,
 				\CURLOPT_ENCODING => '',
 				\CURLOPT_MAXREDIRS => 10,
