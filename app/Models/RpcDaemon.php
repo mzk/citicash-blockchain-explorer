@@ -199,9 +199,6 @@ class RpcDaemon
 			],
 		];
 
-		//$response = $this->client->get($path, $options);
-		//$responseJson = Json::decode($response->getBody()->getContents());
-
 		$curl = \curl_init();
 		\curl_setopt_array($curl, [
 			\CURLOPT_PORT => $this->port,
