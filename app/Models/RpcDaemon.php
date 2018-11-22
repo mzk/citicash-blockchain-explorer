@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Handler\StreamHandler;
 use GuzzleHttp\HandlerStack;
 use Nette\Application\BadRequestException;
+use Nette\InvalidStateException;
 use Nette\Utils\Json;
 use stdClass;
 
@@ -27,6 +28,11 @@ class RpcDaemon
 	 */
 	private $client;
 
+	/**
+	 * @var resource
+	 */
+	private $curl;
+
 	public function __construct(string $host, int $port)
 	{
 		$this->host = $host;
@@ -41,6 +47,10 @@ class RpcDaemon
 				'handler' => $stack,
 			]
 		);
+		$this->curl = \curl_init();
+		if ($this->curl === false || $this->curl === null) {
+			throw new InvalidStateException('Failed curl_init');
+		}
 	}
 
 	public function getInfo(): InfoData
@@ -199,7 +209,8 @@ class RpcDaemon
 			],
 		];
 
-		$curl = \curl_init();
+		$curl = $this->curl;
+
 		\curl_setopt_array($curl, [
 			\CURLOPT_PORT => $this->port,
 			\CURLOPT_URL => $this->host . $path,
@@ -215,7 +226,7 @@ class RpcDaemon
 		$response = \curl_exec($curl);
 		$err = \curl_error($curl);
 
-		\curl_close($curl);
+		//\curl_close($curl);
 
 		if ($err !== '') {
 			throw new BadRequestException($err);
