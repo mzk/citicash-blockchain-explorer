@@ -188,6 +188,17 @@ class RpcDaemon
 	 */
 	private function getResponse(string $path, array $body): stdClass
 	{
+		return $this->getResponseOld($path, $body);
+	}
+
+	/**
+	 * @param string $path
+	 * @param mixed[] $body
+	 * @return stdClass
+	 * @throws BadRequestException
+	 */
+	private function getResponseOld(string $path, array $body): stdClass
+	{
 		if ($this->curl === null) {
 			$this->curl = \curl_init();
 		}
