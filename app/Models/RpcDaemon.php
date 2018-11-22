@@ -195,7 +195,7 @@ class RpcDaemon
 	{
 		$this->requestsCount++;
 
-		//		return $this->getResponseOld($path, $body);
+		//return $this->getResponseOld($path, $body);
 		return $this->getResponseModern($path, $body);
 	}
 
