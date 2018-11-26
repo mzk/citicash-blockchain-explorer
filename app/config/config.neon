@@ -22,6 +22,7 @@ services:
 	- App\Models\Filters\TemplateFilters()
 	- App\Forms\ViewKeyFormFactory
 	- App\Forms\FormFactory
+	- App\Models\RedisStorageService(%redis_host%)
 	nette.latteFactory:
 		setup:
 			- addFilter(null,[App\Models\Filters\TemplateFilters(), 'loader'])
@@ -36,3 +37,11 @@ http:
 		X-Frame-Options: 'DENY'
 		X-Powered-By: CitiCash Nette
 		X-XSS-Protection: '1; mode=block'
+
+extensions:
+	redis: Kdyby\Redis\DI\RedisExtension
+
+redis:
+	journal: on
+	storage: on
+	session: on

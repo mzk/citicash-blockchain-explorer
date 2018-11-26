@@ -3,11 +3,13 @@
 namespace App\Presenters;
 
 use App\Forms\ViewKeyFormFactory;
+use App\Models\RedisStorageService;
 use App\Models\RpcDaemon;
 use Nette\Application\BadRequestException;
 use Nette\Application\Responses\JsonResponse;
 use Nette\Application\UI\Form;
 use Nette\Bridges\ApplicationLatte\Template;
+use Nette\Caching\Cache;
 use Nette\Utils\Paginator;
 
 /**
@@ -28,11 +30,17 @@ class HomepagePresenter extends BasePresenter
 	 */
 	private $viewKeyFormFactory;
 
-	public function __construct(RpcDaemon $rpcDaemon, ViewKeyFormFactory $viewKeyFormFactory)
+	/**
+	 * @var RedisStorageService
+	 */
+	private $redisStorageService;
+
+	public function __construct(RpcDaemon $rpcDaemon, ViewKeyFormFactory $viewKeyFormFactory, RedisStorageService $redisStorageService)
 	{
 		parent::__construct();
 		$this->rpcDaemon = $rpcDaemon;
 		$this->viewKeyFormFactory = $viewKeyFormFactory;
+		$this->redisStorageService = $redisStorageService;
 	}
 
 	public function beforeRender(): void
@@ -51,8 +59,7 @@ class HomepagePresenter extends BasePresenter
 			$heightStart = $lastHeight;
 		}
 
-		$transPoolData = $this->rpcDaemon->getTransactionPool()->getAllData();
-		$this->template->tpData = $transPoolData;
+		$cache = new Cache($this->redisStorageService->getStorage());
 
 		$blocks = $this->rpcDaemon->getBlocksByHeight($heightStart, self::ITEMS_PER_PAGE);
 		foreach ($blocks as $block) {
@@ -60,6 +67,7 @@ class HomepagePresenter extends BasePresenter
 				$block->setTransactions($this->rpcDaemon->getTransactions($block->getTxHashes()));
 			}
 		}
+
 		$this->template->blocks = $blocks;
 		$this->template->heightStart = $heightStart;
 		$paginator = new Paginator();
@@ -68,6 +76,12 @@ class HomepagePresenter extends BasePresenter
 		$paginator->setPage($heightStart / self::ITEMS_PER_PAGE);
 		$paginator->setBase(1);
 		$this->template->paginator = $paginator;
+		if ($heightStart === $lastHeight) {
+			$this->template->tpData = $cache->load('mempool', function (&$depencies) {
+				$depencies = [Cache::EXPIRE => '10 seconds'];
+				return $this->rpcDaemon->getTransactionPool()->getAllData();
+			});
+		}
 	}
 
 	public function renderDetail(string $hash): void
@@ -76,6 +90,9 @@ class HomepagePresenter extends BasePresenter
 			$blockData = $this->rpcDaemon->getBlockByHash($hash);
 			//\dump($blockData);
 			$this->template->block = $blockData;
+			if ($blockData->getAge() > 30 * 60) {
+				\header('Cache-Control: public, max-age=31536000');
+			}
 		} catch (BadRequestException $e) {
 			$this->redirect('transaction', $hash);
 		}
@@ -98,7 +115,11 @@ class HomepagePresenter extends BasePresenter
 			$block = $this->rpcDaemon->getBlockByHeight((int)$transaction->block_height);
 		}
 		//dump($block);
-
+		if ($this->request->getPost('viewKey') !== null) {
+			\header('Cache-Control: public, max-age=31536000');
+		} else {
+			\header('Cache-Control: no-cache, no-store, must-revalidate');
+		}
 		$this->template->block = $block;
 		$this->template->transaction = $transaction;
 	}
