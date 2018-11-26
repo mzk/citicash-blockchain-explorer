@@ -120,10 +120,10 @@ class HomepagePresenter extends BasePresenter
 			$block = $this->rpcDaemon->getBlockByHeight((int)$transaction->block_height);
 		}
 		//dump($block);
-		if ($this->request->getPost('viewKey') !== null) {
-			$this->getHttpResponse()->setHeader('Cache-Control', 'public, max-age=31536000'); //365 days
-		} else {
+		if ($this->request->isMethod('POST')) {
 			$this->getHttpResponse()->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+		} else {
+			$this->getHttpResponse()->setHeader('Cache-Control', 'public, max-age=31536000'); //365 days
 		}
 		$this->template->block = $block;
 		$this->template->transaction = $transaction;
