@@ -20,6 +20,6 @@ class RedisStorageService
 
 	public function getStorage(): RedisStorage
 	{
-		return new RedisStorage(new RedisClient($this->redisHost));
+		return new RedisStorage(new RedisClient($this->redisHost, null, 3));
 	}
 }
