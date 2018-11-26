@@ -1,4 +1,5 @@
 parameters:
+	redis_host: "127.0.0.1"
 
 application:
 	errorPresenter: Error
