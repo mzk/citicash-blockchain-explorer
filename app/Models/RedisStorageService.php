@@ -13,13 +13,19 @@ class RedisStorageService
 	 */
 	private $redisHost;
 
-	public function __construct(string $redis_host)
+	/**
+	 * @var int
+	 */
+	private $redisDatabase;
+
+	public function __construct(string $redisHost, int $redisDatabase)
 	{
-		$this->redisHost = $redis_host;
+		$this->redisHost = $redisHost;
+		$this->redisDatabase = $redisDatabase;
 	}
 
 	public function getStorage(): RedisStorage
 	{
-		return new RedisStorage(new RedisClient($this->redisHost, null, 3));
+		return new RedisStorage(new RedisClient($this->redisHost, null, $this->redisDatabase));
 	}
 }

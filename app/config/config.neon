@@ -1,5 +1,6 @@
 parameters:
 	redis_host: "127.0.0.1"
+	redis_database: 3
 
 application:
 	errorPresenter: Error
@@ -13,7 +14,7 @@ tracy:
 	showLocation: true
 
 session:
-	autoStart: true
+	autoStart: false
 	expiration: 14 days
 
 
@@ -23,7 +24,7 @@ services:
 	- App\Models\Filters\TemplateFilters()
 	- App\Forms\ViewKeyFormFactory
 	- App\Forms\FormFactory
-	- App\Models\RedisStorageService(%redis_host%)
+	- App\Models\RedisStorageService(%redis_host%, %redis_database%)
 	nette.latteFactory:
 		setup:
 			- addFilter(null,[App\Models\Filters\TemplateFilters(), 'loader'])
