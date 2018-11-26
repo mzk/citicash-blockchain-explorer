@@ -29,7 +29,7 @@ class RpcDaemon
 	private $client;
 
 	/**
-	 * @var resource
+	 * @var ?resource
 	 */
 	private $curl;
 
