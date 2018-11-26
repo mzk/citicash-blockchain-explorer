@@ -91,7 +91,7 @@ class HomepagePresenter extends BasePresenter
 			//\dump($blockData);
 			$this->template->block = $blockData;
 			if ($blockData->getAge() > 30 * 60) {
-				$this->getHttpResponse()->seteader('Cache-Control', 'public, max-age=31536000');
+				$this->getHttpResponse()->setHeader('Cache-Control', 'public, max-age=31536000');
 			}
 		} catch (BadRequestException $e) {
 			$this->redirect('transaction', $hash);
@@ -116,7 +116,7 @@ class HomepagePresenter extends BasePresenter
 		}
 		//dump($block);
 		if ($this->request->getPost('viewKey') !== null) {
-			$this->getHttpResponse()->seteader('Cache-Control', 'public, max-age=31536000');
+			$this->getHttpResponse()->setHeader('Cache-Control', 'public, max-age=31536000');
 		} else {
 			$this->getHttpResponse()->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
 		}
