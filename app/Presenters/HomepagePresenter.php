@@ -76,8 +76,8 @@ class HomepagePresenter extends BasePresenter
 		$this->template->paginator = $paginator;
 		if ($heightStart === $lastHeight) {
 			$cache = new Cache($this->redisStorageService->getStorage());
-			$this->template->tpData = $cache->load('mempool', function (&$depencies) {
-				$depencies = [Cache::EXPIRE => '10 seconds'];
+			$this->template->tpData = $cache->load('mempool', function (&$expiration) {
+				$expiration = [Cache::EXPIRE => '10 seconds'];
 
 				return $this->rpcDaemon->getTransactionPool()->getAllData();
 			});
