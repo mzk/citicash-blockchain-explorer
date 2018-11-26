@@ -59,8 +59,6 @@ class HomepagePresenter extends BasePresenter
 			$heightStart = $lastHeight;
 		}
 
-		$cache = new Cache($this->redisStorageService->getStorage());
-
 		$blocks = $this->rpcDaemon->getBlocksByHeight($heightStart, self::ITEMS_PER_PAGE);
 		foreach ($blocks as $block) {
 			if (\count($block->getTxHashes()) > 0) {
@@ -77,8 +75,10 @@ class HomepagePresenter extends BasePresenter
 		$paginator->setBase(1);
 		$this->template->paginator = $paginator;
 		if ($heightStart === $lastHeight) {
+			$cache = new Cache($this->redisStorageService->getStorage());
 			$this->template->tpData = $cache->load('mempool', function (&$depencies) {
 				$depencies = [Cache::EXPIRE => '10 seconds'];
+
 				return $this->rpcDaemon->getTransactionPool()->getAllData();
 			});
 		}
