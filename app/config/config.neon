@@ -22,6 +22,7 @@ services:
 	- App\Models\Filters\TemplateFilters()
 	- App\Forms\ViewKeyFormFactory
 	- App\Forms\FormFactory
+	- App\Models\RedisStorageService(%redis_host%)
 	nette.latteFactory:
 		setup:
 			- addFilter(null,[App\Models\Filters\TemplateFilters(), 'loader'])

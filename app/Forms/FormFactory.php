@@ -18,7 +18,6 @@ class FormFactory
 	public function create(): Form
 	{
 		$form = new Form();
-		$form->addProtection('Timeout expired, submit form again');
 		$form->onRender[] = 'App\Forms\FormFactory::makeBootstrap4';
 
 		return $form;

@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "f508cf5390e77ebc49faedc30085c4f6",
+    "content-hash": "6a7505f24f25e87d8ed3f395962c709c",
     "packages": [
         {
             "name": "guzzlehttp/guzzle",
@@ -187,6 +187,92 @@
                 "url"
             ],
             "time": "2018-07-29T08:09:46+00:00"
+        },
+        {
+            "name": "kdyby/redis",
+            "version": "v4.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Kdyby/Redis.git",
+                "reference": "15f527490d3d6f329d0b429aee6accb537ac9cdc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Kdyby/Redis/zipball/15f527490d3d6f329d0b429aee6accb537ac9cdc",
+                "reference": "15f527490d3d6f329d0b429aee6accb537ac9cdc",
+                "shasum": ""
+            },
+            "require": {
+                "nette/caching": "~2.5",
+                "nette/di": "~2.4",
+                "nette/http": "~2.4",
+                "nette/utils": "~2.4",
+                "php": ">=7.0"
+            },
+            "require-dev": {
+                "latte/latte": "~2.4",
+                "nette/application": "~2.4",
+                "nette/bootstrap": "~2.4",
+                "nette/caching": "~2.5",
+                "nette/component-model": "~2.3",
+                "nette/database": "~2.4",
+                "nette/deprecated": "~2.4",
+                "nette/di": "~2.4",
+                "nette/finder": "~2.4",
+                "nette/forms": "~2.4",
+                "nette/http": "~2.4",
+                "nette/mail": "~2.4",
+                "nette/neon": "~2.4",
+                "nette/php-generator": "~2.6",
+                "nette/reflection": "~2.4",
+                "nette/robot-loader": "~2.4",
+                "nette/safe-stream": "~2.3",
+                "nette/security": "~2.4",
+                "nette/tester": "~1.7",
+                "nette/tokenizer": "~2.3",
+                "nette/utils": "~2.4",
+                "tracy/tracy": "~2.4"
+            },
+            "suggest": {
+                "ext-redis": "The php redis extension https://github.com/nicolasff/phpredis/ is required for connecting to redis server"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "4.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Kdyby\\Redis\\": "src/"
+                },
+                "classmap": [
+                    "src/Kdyby/Redis/exceptions.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause",
+                "GPL-2.0",
+                "GPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Filip Procházka",
+                    "email": "filip@prochazka.su",
+                    "homepage": "http://filip-prochazka.com"
+                }
+            ],
+            "description": "Redis storage for Nette Framework",
+            "homepage": "http://kdyby.org",
+            "keywords": [
+                "cache",
+                "client",
+                "kdyby",
+                "nette",
+                "redis"
+            ],
+            "time": "2018-05-03T07:00:07+00:00"
         },
         {
             "name": "latte/latte",
@@ -1586,12 +1672,14 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "guzzlehttp/guzzle": 20,
+        "kdyby/redis": 20,
         "nette/tester": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">= 7.2"
+        "php": ">= 7.2",
+        "ext-curl": "*"
     },
     "platform-dev": [],
     "platform-overrides": {
