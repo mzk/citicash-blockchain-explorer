@@ -15,7 +15,6 @@ tracy:
 
 session:
 	autoStart: false
-	expiration: 14 days
 
 
 services:
