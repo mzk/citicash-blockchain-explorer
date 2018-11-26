@@ -75,12 +75,15 @@ class HomepagePresenter extends BasePresenter
 		$paginator->setBase(1);
 		$this->template->paginator = $paginator;
 		if ($heightStart === $lastHeight) {
+			$this->getHttpResponse()->setHeader('Cache-Control', 'public, max-age=20');
 			$cache = new Cache($this->redisStorageService->getStorage());
 			$this->template->tpData = $cache->load('mempool', function (&$expiration) {
 				$expiration = [Cache::EXPIRE => '10 seconds'];
 
 				return $this->rpcDaemon->getTransactionPool()->getAllData();
 			});
+		} else {
+			$this->getHttpResponse()->setHeader('Cache-Control', 'public, max-age=2592000'); //month
 		}
 	}
 
@@ -90,8 +93,10 @@ class HomepagePresenter extends BasePresenter
 			$blockData = $this->rpcDaemon->getBlockByHash($hash);
 			//\dump($blockData);
 			$this->template->block = $blockData;
-			if ($blockData->getAge() > 30 * 60) {
-				$this->getHttpResponse()->setHeader('Cache-Control', 'public, max-age=31536000');
+			if ($blockData->getAge() > (30 * 60)) {
+				$this->getHttpResponse()->setHeader('Cache-Control', 'public, max-age=31536000'); //365 days
+			} else {
+				$this->getHttpResponse()->setHeader('Cache-Control', 'public, max-age=30'); //365 days
 			}
 		} catch (BadRequestException $e) {
 			$this->redirect('transaction', $hash);
@@ -116,7 +121,7 @@ class HomepagePresenter extends BasePresenter
 		}
 		//dump($block);
 		if ($this->request->getPost('viewKey') !== null) {
-			$this->getHttpResponse()->setHeader('Cache-Control', 'public, max-age=31536000');
+			$this->getHttpResponse()->setHeader('Cache-Control', 'public, max-age=31536000'); //365 days
 		} else {
 			$this->getHttpResponse()->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
 		}
