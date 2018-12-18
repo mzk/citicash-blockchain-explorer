@@ -35,6 +35,7 @@ class FormFactory
 
 		foreach ($form->getControls() as $control) {
 			$type = $control->getOption('type');
+
 			if ($type === 'button') {
 				$control->getControlPrototype()->addClass('btn red-button');
 			} elseif (\in_array($type, ['text', 'textarea', 'select'], true)) {
@@ -47,6 +48,7 @@ class FormFactory
 				} else {
 					$control->getItemLabelPrototype()->addClass('form-check-label');
 				}
+
 				$control->getControlPrototype()->addClass('form-check-input');
 				$control->getSeparatorPrototype()->setName('div')->addClass('form-check');
 			}

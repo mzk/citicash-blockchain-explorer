@@ -49,7 +49,7 @@ class TemplateFilters
 			$result = \gmstrftime('%H:%M:%S', $timeBefore);
 		} else {
 			$days = \floor($timeBefore / $day);
-			$daysString = (string)$days < 10 ? '0' . $days : $days;
+			$daysString = ((string)$days < 10 ? '0' . $days : $days);
 			$inday = $timeBefore % $day;
 			$result = $daysString . ':' . \gmstrftime('%H:%M:%S', $inday);
 		}

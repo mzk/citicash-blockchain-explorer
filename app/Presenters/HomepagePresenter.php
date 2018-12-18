@@ -55,11 +55,13 @@ class HomepagePresenter extends BasePresenter
 	public function renderDefault(int $heightStart = 0): void
 	{
 		$lastHeight = $this->rpcDaemon->getHeight() - 1;
+
 		if ($heightStart === 0) {
 			$heightStart = $lastHeight;
 		}
 
 		$blocks = $this->rpcDaemon->getBlocksByHeight($heightStart, self::ITEMS_PER_PAGE);
+
 		foreach ($blocks as $block) {
 			if (\count($block->getTxHashes()) > 0) {
 				$block->setTransactions($this->rpcDaemon->getTransactions($block->getTxHashes()));
@@ -74,6 +76,7 @@ class HomepagePresenter extends BasePresenter
 		$paginator->setPage($heightStart / self::ITEMS_PER_PAGE);
 		$paginator->setBase(1);
 		$this->template->paginator = $paginator;
+
 		if ($heightStart === $lastHeight) {
 			$this->getHttpResponse()->setHeader('Cache-Control', 'public, max-age=20');
 			$cache = new Cache($this->redisStorageService->getStorage());
@@ -93,6 +96,7 @@ class HomepagePresenter extends BasePresenter
 			$blockData = $this->rpcDaemon->getBlockByHash($hash);
 			//\dump($blockData);
 			$this->template->block = $blockData;
+
 			if ($blockData->getAge() > (30 * 60)) {
 				$this->getHttpResponse()->setHeader('Cache-Control', 'public, max-age=31536000'); //365 days
 			} else {
@@ -116,15 +120,18 @@ class HomepagePresenter extends BasePresenter
 		$transaction = $transactions[0]->getData();
 		//\dump($transaction);
 		$block = null;
+
 		if ($transaction->in_pool === false) {
 			$block = $this->rpcDaemon->getBlockByHeight((int)$transaction->block_height);
 		}
+
 		//dump($block);
 		if ($this->request->isMethod('POST')) {
 			$this->getHttpResponse()->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
 		} else {
 			$this->getHttpResponse()->setHeader('Cache-Control', 'public, max-age=31536000'); //365 days
 		}
+
 		$this->template->block = $block;
 		$this->template->transaction = $transaction;
 	}

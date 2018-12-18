@@ -18,9 +18,11 @@ abstract class BasePresenter extends Presenter
 		$form->addSubmit('send');
 		$form->onSuccess[] = function (Form $form, array $values): void {
 			$search = $values['search'];
+
 			if (\is_numeric($search)) {
 				$this->redirect('detailByHeight', $search);
 			}
+
 			$this->redirect('detail', $search);
 		};
 

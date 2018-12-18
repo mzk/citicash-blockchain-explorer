@@ -179,7 +179,7 @@ class BlockData
 		$blockData->minerTxVin = $json->miner_tx->vin;
 		$blockData->minerTxVout = $json->miner_tx->vout;
 		$blockData->minerTxExtra = $json->miner_tx->extra;
-		$blockData->rawResultJsonRctSignatures = isset($json->miner_tx->rct_signatures) ? 'yes' : 'no';
+		$blockData->rawResultJsonRctSignatures = (isset($json->miner_tx->rct_signatures) ? 'yes' : 'no');
 		$blockData->rawResultJsonRctSignaturesType = $json->miner_tx->rct_signatures->type;
 
 		//$blockData->minerTxSignatures = $json->miner_tx->signatures;
