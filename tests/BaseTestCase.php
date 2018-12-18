@@ -27,6 +27,7 @@ abstract class BaseTestCase extends TestCase
 
 			return;
 		}
+
 		parent::run();
 	}
 }

@@ -32,7 +32,13 @@
 		"kdyby/redis": "^4.0@dev"
 	},
 	"require-dev": {
-		"nette/tester": "^2.1@dev"
+		"nette/tester": "^2.1@dev",
+		"mockery/mockery": "dev-master",
+		"phpstan/phpstan-shim": "^0.11.0@dev",
+		"phpstan/phpstan-strict-rules": "^0.11.0@dev",
+		"phpstan/phpstan-doctrine": "^0.11.0@dev",
+		"phpstan/phpstan-mockery": "^0.11.0@dev",
+		"phpstan/phpstan-nette": "^0.11.0@dev"
 	},
 	"minimum-stability": "dev",
 	"config": {

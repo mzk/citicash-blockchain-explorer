@@ -26,14 +26,12 @@ class TransactionData
 		$data->in_pool = $response->in_pool;
 		$data->tx_mixin = $response->tx_mixin ?? '?N/A';
 		$data->tx_size = $response->tx_size ?? '?N/A';
+
 		if (isset($response->output_indices)) {
 			$data->output_indices = $response->output_indices;
 		}
-		if (isset($response->tx_amount)) {
-			$data->tx_amount = $response->tx_amount;
-		} else {
-			$data->tx_amount = null;
-		}
+
+		$data->tx_amount = $response->tx_amount ?? null;
 		$data->tx_hash = $response->tx_hash;
 		//dump($data);
 

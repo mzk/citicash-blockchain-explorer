@@ -33,9 +33,9 @@ class ErrorPresenter extends Nette\Application\UI\Presenter
 		$this->template->lang = 'en';
 
 		$e = $request->getParameter('exception');
+
 		if ($e instanceof Nette\Application\BadRequestException) {
 			// $this->logger->log("HTTP code {$e->getCode()}: {$e->getMessage()} in {$e->getFile()}:{$e->getLine()}", 'access');
-
 			$file = \sprintf('%s/../templates/Error/%s.latte', __DIR__, $e->getCode());
 
 			if (\is_file($file) === false) {

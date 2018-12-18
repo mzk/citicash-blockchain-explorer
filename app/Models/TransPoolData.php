@@ -97,6 +97,7 @@ class TransPoolData
 		$this->maxUsedBlockIdHash = $data->max_used_block_id_hash;
 		$this->receiveTime = $data->receive_time;
 		$this->relayed = $data->relayed;
+
 		//$this->doNotRelay = $data->do_not_relay;
 		//$this->doubleSpendSeen = $data->double_spend_seen;
 		//$this->lastRelayedTime = $data->last_relayed_time;
