@@ -104,8 +104,8 @@ then
 #    development=true php app/console orm:validate || { out=1; }
     echo_blue "private:test-coding-style"
     #php app/console cache:warmup --env=dev || { out=1; }
-    echo_blue "php vendor/coding-style-checkers/vendor/bin/parallel-lint -e php,phpt,phtml -j 5 --exclude vendor --show-deprecated ."
-    php vendor/coding-style-checkers/vendor/bin/parallel-lint -e php,phpt,phtml -j 5 --exclude vendor --show-deprecated . || { out=1; }
+    echo_blue "php vendor/coding-style-checkers/vendor/bin/parallel-lint -e php,phpt,phtml -j 5 --show-deprecated --exclude vendor --exclude var ."
+    php vendor/coding-style-checkers/vendor/bin/parallel-lint -e php,phpt,phtml -j 5 --show-deprecated --exclude vendor --exclude var . || { out=1; }
     echo_blue "phpcs app"
     vendor/coding-style-checkers/vendor/bin/phpcs --standard=ruleset.xml --extensions=php,phpt --warning-severity=0 --encoding=utf-8 --report-width=auto -sp app tests || { out=1; }
     echo_blue "nette code checker"
