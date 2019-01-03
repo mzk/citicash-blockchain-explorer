@@ -25,3 +25,6 @@ parameters:
 		- tests/autoloadForPhpstan.php
 	ignoreErrors:
 		- '#Only booleans are allowed in a negated boolean, int given.#'
+		- '#Call to an undefined method Nette\\Application\\IPresenter::getName().#'
+		- '#Call to an undefined method Nette\\Application\\IResponse::getSource().#'
+		- '#Call to an undefined method Nette\\Application\\IResponse::getPayload().#'

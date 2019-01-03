@@ -1,5 +1,5 @@
 parameters:
-	daemon_url: 'http://ubnt'
+	daemon_url: 'http://66.42.102.15'
 	daemon_port: 19834
 	redis_host: "127.0.0.1"
 	settings:
