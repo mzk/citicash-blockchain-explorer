@@ -156,6 +156,7 @@ class HomepagePresenter extends BasePresenter
 			'hashRate' => $infoData->getHashRate(),
 			'reward' => $block->getReward(),
 			'dateTime' => $block->getDateTime(),
+			'height' => $lastHeight + 1,
 		];
 
 		$this->sendJson($response);
