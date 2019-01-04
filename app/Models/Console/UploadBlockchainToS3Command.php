@@ -80,5 +80,7 @@ class UploadBlockchainToS3Command extends Command
 		$copyToAnother = \sprintf('scp /home/ubuntu/mounted2/blockchain.raw.md5sum.txt %s:/home/ubuntu/blockchain.raw.md5sum.txt', $this->citicashIoServer);
 		$copyToAnotherProcess = Process::fromShellCommandline($copyToAnother);
 		$copyToAnotherProcess->run();
+
+		return 0;
 	}
 }
