@@ -55,16 +55,16 @@ class UploadBlockchainToS3Command extends Command
 			]
 		);
 
-		$command = '~/mounted2/citicash-blockchain-export --data-dir ~/mounted2/.citicash --output-file ~/mounted2/blockchain.raw.tmp';
+		$command = '/home/ubuntu/mounted2/citicash-blockchain-export --data-dir /home/ubuntu/mounted2/.citicash --output-file /home/ubuntu/mounted2/blockchain.raw.tmp';
 		$output->writeln($command);
 		$process = Process::fromShellCommandline($command);
 		$process->run();
 
 		$output->writeln('md5sum');
-		$md5sumProcess = Process::fromShellCommandline('md5sum ~/mounted2/blockchain.raw.tmp > ~/mounted2/blockchain.raw.md5sum.txt');
+		$md5sumProcess = Process::fromShellCommandline('md5sum /home/ubuntu/mounted2/blockchain.raw.tmp > /home/ubuntu/mounted2/blockchain.raw.md5sum.txt');
 		$md5sumProcess->run();
 
-		$uploader = new MultipartUploader($s3Client, '~/mounted2/blockchain.raw.tmp', [
+		$uploader = new MultipartUploader($s3Client, '/home/ubuntu/mounted2/blockchain.raw.tmp', [
 			'bucket' => 'citicashblockchain',
 			'key' => 'blockchain.raw',
 		]);
