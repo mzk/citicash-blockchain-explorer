@@ -24,6 +24,7 @@ services:
 	- App\Forms\ViewKeyFormFactory
 	- App\Forms\FormFactory
 	- App\Models\RedisStorageService(%redis_host%, %redis_database%)
+	- App\Models\Console\UploadBlockchainToS3Command(%s3_key%, %s3_secret%, %citicash_io_server%)
 	nette.latteFactory:
 		setup:
 			- addFilter(null,[App\Models\Filters\TemplateFilters(), 'loader'])
