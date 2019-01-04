@@ -25,7 +25,6 @@ $configurator->enableTracy();
 $configurator->setTempDirectory(__DIR__ . '/../var/' . $tempDirectory);
 
 $configurator->setTimeZone('Europe/Prague');
-$configurator->setTempDirectory(__DIR__ . '/../var/temp');
 
 $configurator->createRobotLoader()
 	->addDirectory(__DIR__)
