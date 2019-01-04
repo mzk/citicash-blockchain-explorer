@@ -42,7 +42,7 @@ class UploadBlockchainToS3Command extends Command
 		$this->setName('upload-to-s3');
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output): void
+	protected function execute(InputInterface $input, OutputInterface $output): ?int
 	{
 		$s3Client = new S3Client(
 			[
