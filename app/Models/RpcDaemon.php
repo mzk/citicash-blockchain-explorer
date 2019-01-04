@@ -137,11 +137,14 @@ class RpcDaemon
 	public function getBlocksByHeight(int $heightStart, int $limit): array
 	{
 		$response = [];
+
 		for ($i = 0; $i < $limit; $i++) {
 			$actualHeightPointer = $heightStart - $i;
+
 			if ($actualHeightPointer < 1) {
 				break;
 			}
+
 			$response[$actualHeightPointer] = $this->getBlockByHeight($actualHeightPointer);
 		}
 
@@ -165,6 +168,7 @@ class RpcDaemon
 		}
 
 		$response = $this->getResponse('/gettransactions', $body);
+
 		if (isset($response->missed_tx)) {
 			throw new BadRequestException('Missed_tx');
 		}
@@ -178,6 +182,7 @@ class RpcDaemon
 		}
 
 		$return = [];
+
 		foreach ($response->txs as $tx) {
 			$return[] = TransactionData::fromResponse($tx);
 		}

@@ -36,14 +36,20 @@
 					{/if}
 				</div>
 			</div>
-			<div class="list__row" n:foreach="$block->getMinerTxVout() as $output">
-				<div class="list__item list__item--20w">Output Total:</div>
-				<div class="list__item list__item--80w">{$output->amount|amountInt} CCH</div>
-			</div>
-			<div class="list__row" n:foreach="$block->getMinerTxVin() as $input">
-				<div class="list__item list__item--20w">Input Total:</div>
-				<div class="list__item list__item--80w">{$input->gen->height|numberFormat}</div>
-			</div>
+			{*<div class="list__row" n:foreach="$block->getMinerTxVout() as $output">*}
+				{*<div class="list__item list__item--20w">Output Total:</div>*}
+				{*<div class="list__item list__item--80w">*}
+					{*{if $output->amount === 0}*}
+						{*confidential*}
+					{*{else}*}
+						{*{$output->amount|amountInt} CCH*}
+					{*{/if}*}
+				{*</div>*}
+			{*</div>*}
+			{*<div class="list__row" n:foreach="$block->getMinerTxVin() as $input">*}
+				{*<div class="list__item list__item--20w">Input Total:</div>*}
+				{*<div class="list__item list__item--80w">{$input->gen->height|numberFormat}</div>*}
+			{*</div>*}
 			<div class="list__row">
 				<div class="list__item list__item--20w">Tx Size:</div>
 				<div class="list__item list__item--80w">{$block->getBlockSize()|bytes|hardSpace|noescape}</div>
@@ -54,11 +60,15 @@
 			</div>
 			<div class="list__row">
 				<div class="list__item list__item--20w">Reward:</div>
-				<div class="list__item list__item--80w">{$block->getReward()|amountInt} CCH</div>
+				<div class="list__item list__item--80w">{$block->getReward() - $block->getFee()|amountInt} CCH</div>
 			</div>
 			<div class="list__row">
 				<div class="list__item list__item--20w">Fee:</div>
 				<div class="list__item list__item--80w">{$block->getFee()|amountInt} CCH</div>
+			</div>
+			<div class="list__row">
+				<div class="list__item list__item--20w">Reward + Fee:</div>
+				<div class="list__item list__item--80w">{$block->getReward()|amountInt} CCH</div>
 			</div>
 			<div class="list__row">
 				<div class="list__item list__item--20w">Nonce:</div>

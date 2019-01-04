@@ -12,6 +12,7 @@ $configurator = new Configurator();
 
 $debugMode = $configurator->isDebugMode();
 $tempDirectory = 'temp';
+
 if (\PHP_SAPI === 'cli') {
 	$debugMode = \getenv('development') === 'true';
 	$tempDirectory = 'tempcli';
@@ -35,10 +36,12 @@ $configurator->addConfig(__DIR__ . '/config/config.local.neon');
 
 Debugger::enable(!$debugMode, __DIR__ . '/../var/log', 'salek@citicash.io');
 
-\set_error_handler(function ($severity, $message, $file, $line): void {
+\set_error_handler(function (int $severity, string $message, string $file, int $line): void {
 	if (!(\error_reporting() & $severity)) { // This error code is not included in error_reporting
+
 		return;
 	}
+
 	throw new \ErrorException($message, 0, $severity, $file, $line);
 });
 
@@ -49,6 +52,5 @@ $application = $container->getByType(Application::class);
 $application->errorPresenter = 'Error';
 Debugger::$errorTemplate = __DIR__ . '/templates/Error/500.phtml';
 $application->catchExceptions = !$configurator->isDebugMode();
-
 
 return $container;

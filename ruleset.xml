@@ -115,6 +115,7 @@
 		<exclude name="Generic.Strings.UnnecessaryStringConcat.Found"/>
 		<exclude name="Squiz.Strings.DoubleQuoteUsage.ContainsVar"/>
 		<exclude name="Generic.CodeAnalysis.EmptyStatement.DetectedCatch"/>
+		<exclude name="Squiz.WhiteSpace.ControlStructureSpacing.SpacingAfterOpen"/>
 	</rule>
 	<rule ref="SlevomatCodingStandard.TypeHints.TypeHintDeclaration">
 		<properties>

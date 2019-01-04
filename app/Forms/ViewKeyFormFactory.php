@@ -30,6 +30,7 @@ class ViewKeyFormFactory
 
 		$form->onSuccess[] = function (Form $form) use ($onClear): void {
 			$submitterControl = $form->isSubmitted();
+
 			if ($submitterControl instanceof ISubmitterControl && $submitterControl->getValue() === 'Reset') {
 				$onClear();
 			}

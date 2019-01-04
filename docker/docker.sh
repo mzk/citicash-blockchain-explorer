@@ -81,8 +81,9 @@ fi
 
 if [ "$1" = "private:travis:before_script" ]
 then
-    if [ ! -d "vendor/coding-style-checkers" ]; then git clone https://github.com/mzk/coding-style-checkers.git vendor/coding-style-checkers && composer install --no-interaction --prefer-dist --no-dev -d vendor/coding-style-checkers; fi
+    if [ ! -d "vendor/coding-style-checkers" ]; then git clone http://gitlab.citicash.loc/salek/coding-style-checkers.git vendor/coding-style-checkers && composer install --no-interaction --prefer-dist --no-dev -d vendor/coding-style-checkers; fi
     if [ ! -d "vendor/code-checker" ]; then composer create-project nette/code-checker -d vendor; fi
+#    if [ ! -d "node_modules" ]; then npm install; fi
 fi
 
 
@@ -101,20 +102,24 @@ then
     out=0
 #    echo_blue "development=true php app/console orm:validate"
 #    development=true php app/console orm:validate || { out=1; }
-#    echo_blue "development=true php app/console orm:schema-tool:update --force"
-#    development=true php app/console orm:schema-tool:update --force || { out=1; }
     echo_blue "private:test-coding-style"
     #php app/console cache:warmup --env=dev || { out=1; }
-    echo_blue "php vendor/coding-style-checkers/vendor/jakub-onderka/php-parallel-lint/parallel-lint.php -e php,phpt,phtml -j 5 --exclude vendor --show-deprecated ."
-    php vendor/coding-style-checkers/vendor/jakub-onderka/php-parallel-lint/parallel-lint.php -e php,phpt,phtml -j 5 --exclude vendor --show-deprecated . || { out=1; }
+    echo_blue "php vendor/coding-style-checkers/vendor/bin/parallel-lint -e php,phpt,phtml -j 5 --show-deprecated --exclude vendor --exclude var ."
+    php vendor/coding-style-checkers/vendor/bin/parallel-lint -e php,phpt,phtml -j 5 --show-deprecated --exclude vendor --exclude var . || { out=1; }
     echo_blue "phpcs app"
     vendor/coding-style-checkers/vendor/bin/phpcs --standard=ruleset.xml --extensions=php,phpt --warning-severity=0 --encoding=utf-8 --report-width=auto -sp app tests || { out=1; }
     echo_blue "nette code checker"
     php vendor/code-checker/code-checker -l -f --short-arrays --strict-types -d app || { out=1; }
     php vendor/code-checker/code-checker -l -f --short-arrays --strict-types -d tests || { out=1; }
-    echo_blue "php -c php.ini vendor/coding-style-checkers/vendor/bin/phpstan analyse -l 7 -c phpstan.neon app tests "
-    rm -rf vendor/php-code-checker/vendor/phpstan/tmp/cache
-    vendor/coding-style-checkers/vendor/bin/phpstan analyse -l 7 -c phpstan.neon app tests || { out=1; }
+    echo_blue "php -c php.ini vendor/bin/phpstan analyse -l 7 -c phpstan.neon app tests"
+    rm -rf vendor/phpstan/tmp/cache
+    vendor/bin/phpstan analyse -l 7 -c phpstan.neon app tests || { out=1; }
+#    echo_blue "gulp javascript"
+#    gulp javascript || { out=1; }
+#    echo_blue "gulp less"
+#    gulp less || { out=1; }
+    echo_blue "./vendor/bin/tester -C -j 3 -o tap -C tests"
+#    rm -rf var/temp/dump.sql
     ./vendor/bin/tester -c php.ini -j 4 -C tests || { out=1; }
     exit $out
 fi
