@@ -1,0 +1,25 @@
+#!/usr/bin/env php
+<?php declare(strict_types = 1);
+
+namespace App;
+
+use App\Models\Console\UploadBlockchainToS3Command;
+use Symfony\Component\Console\Application;
+use Tracy\Debugger;
+
+if (\PHP_SAPI !== 'cli') {
+	die('cli only script!');
+}
+
+$container = require __DIR__ . '/bootstrap.php';
+
+$debugMode = \getenv('development') === 'true';
+Debugger::enable(!$debugMode, __DIR__ . '/../var/log/');
+Debugger::$strictMode = true;
+Debugger::$logSeverity = \E_ALL;
+
+$application = new Application();
+$application->add($container->getByType(UploadBlockchainToS3Command::class));
+$application->setCatchExceptions(true);
+
+$application->run();
