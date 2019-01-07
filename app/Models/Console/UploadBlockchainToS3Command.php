@@ -50,7 +50,7 @@ class UploadBlockchainToS3Command extends Command
 		if (!$this->lock()) {
 			$output->writeln('The command is already running in another process.');
 
-			return 0;
+			return 1;
 		}
 
 		$command = '/home/ubuntu/mounted2/citicash-blockchain-export --data-dir /home/ubuntu/mounted2/.citicash --output-file /home/ubuntu/mounted2/blockchain.raw.tmp';
