@@ -32,7 +32,8 @@
 		"kdyby/redis": "^4.0@dev",
 		"symfony/console": "^4.3@dev",
 		"aws/aws-sdk-php": "^3.0@dev",
-		"symfony/process": "^4.3@dev"
+		"symfony/process": "^4.3@dev",
+		"symfony/lock": "^4.3@dev"
 	},
 	"require-dev": {
 		"nette/tester": "^2.1@dev",
