@@ -64,6 +64,16 @@ class UploadBlockchainToS3Command extends Command
 		$md5sumProcess = Process::fromShellCommandline('md5sum /home/ubuntu/mounted2/blockchain.raw.tmp > /home/ubuntu/mounted2/blockchain.raw.md5sum.txt');
 		$md5sumProcess->run();
 
+		$s3Client = new S3Client(
+			[
+				'credentials' => [
+					'key' => $this->s3Key,
+					'secret' => $this->s3Secret,
+				],
+				'region' => 'eu-west-2',
+				'version' => 'latest',
+			]
+		);
 		$uploader = new MultipartUploader($s3Client, '/home/ubuntu/mounted2/blockchain.raw.tmp', [
 			'bucket' => 'citicashblockchain',
 			'key' => 'blockchain.raw',
