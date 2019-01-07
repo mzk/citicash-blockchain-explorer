@@ -5,13 +5,12 @@ namespace App\Models\Console;
 use Aws\Exception\MultipartUploadException;
 use Aws\S3\MultipartUploader;
 use Aws\S3\S3Client;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 
-class UploadBlockchainToS3Command extends Command
+class UploadBlockchainToS3Command extends BaseCommand
 {
 
 	use LockableTrait;
@@ -57,6 +56,11 @@ class UploadBlockchainToS3Command extends Command
 		$output->writeln($command);
 		$process = Process::fromShellCommandline($command);
 		$process->run();
+		if ($process->getExitCode() !== 0) {
+			$output->writeln($process->getErrorOutput());
+
+			return $process->getExitCode();
+		}
 
 		$output->writeln('md5sum');
 		$md5sumProcess = Process::fromShellCommandline('md5sum /home/ubuntu/mounted2/blockchain.raw.tmp > /home/ubuntu/mounted2/blockchain.raw.md5sum.txt');
