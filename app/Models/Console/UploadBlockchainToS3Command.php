@@ -56,6 +56,7 @@ class UploadBlockchainToS3Command extends BaseCommand
 		$output->writeln($command);
 		$process = Process::fromShellCommandline($command);
 		$process->run();
+
 		if ($process->getExitCode() !== 0) {
 			$output->writeln($process->getErrorOutput());
 

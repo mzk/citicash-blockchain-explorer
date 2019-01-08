@@ -278,6 +278,7 @@ class RpcDaemon
 	 * @param mixed[] $body
 	 * @return stdClass
 	 * @throws BadRequestException
+	 * @throws RpcDaemonDownException
 	 */
 	private function getResponseModern(string $path, array $body): stdClass
 	{
@@ -306,6 +307,7 @@ class RpcDaemon
 		} catch (RequestException $e) {
 			throw new RpcDaemonDownException($e->getMessage(), $e->getCode(), $e);
 		}
+
 		$responseJson = Json::decode($response->getBody()->getContents());
 
 		if (isset($responseJson->error) && isset($responseJson->error->message)) {

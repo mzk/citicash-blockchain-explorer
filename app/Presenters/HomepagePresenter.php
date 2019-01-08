@@ -5,6 +5,7 @@ namespace App\Presenters;
 use App\Forms\ViewKeyFormFactory;
 use App\Models\RedisStorageService;
 use App\Models\RpcDaemon;
+use App\Models\TransactionData;
 use Nette\Application\BadRequestException;
 use Nette\Application\UI\Form;
 use Nette\Bridges\ApplicationLatte\Template;
@@ -61,6 +62,7 @@ class HomepagePresenter extends BasePresenter
 
 		$blocks = $this->rpcDaemon->getBlocksByHeight($heightStart, self::ITEMS_PER_PAGE);
 		$txHashes = [];
+
 		foreach ($blocks as $block) {
 			if (\count($block->getTxHashes()) > 0) {
 				$txHashes[] = $block->getTxHashes();
@@ -68,11 +70,12 @@ class HomepagePresenter extends BasePresenter
 		}
 
 		if (\count($txHashes) > 0) {
-			$txHashes = $this->rpcDaemon->getTransactions(array_merge(...$txHashes));
+			$txHashes = $this->rpcDaemon->getTransactions(\array_merge(...$txHashes));
+
 			foreach ($blocks as $block) {
 				if (\count($block->getTxHashes()) > 0) {
 					$block->setTransactions(\array_filter($txHashes, function (string $key) use ($block) {
-						return \in_array($key, $block->getTxHashes());
+						return \in_array($key, $block->getTxHashes(), true);
 					}, \ARRAY_FILTER_USE_KEY));
 				}
 			}
@@ -127,7 +130,9 @@ class HomepagePresenter extends BasePresenter
 	{
 		$this['viewKeyForm']; // fix session problem
 		$transactions = $this->rpcDaemon->getTransactions([$hash], $this->request->getPost('viewKey'));
-		$transaction = \reset($transactions)->getData();
+		/** @var TransactionData $transaction */
+		$transaction = \reset($transactions);
+		$transaction->getData();
 		//\dump($transaction);
 		$block = null;
 
