@@ -57,7 +57,7 @@ class HomepagePresenterTest extends BasePresenterTestCase
 
 	public function testInfo(): void
 	{
-		$this->openPresenter('Homepage:');
+		$this->openPresenter('Api:');
 		$response = $this->runPresenterAction('info');
 		$payload = $response->getPayload();
 

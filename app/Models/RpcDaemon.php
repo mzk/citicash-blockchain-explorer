@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Models\Exception\RpcDaemonDownException;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Handler\StreamHandler;
 use GuzzleHttp\HandlerStack;
 use Nette\Application\BadRequestException;
@@ -34,9 +36,9 @@ class RpcDaemon
 	private $curl;
 
 	/**
-	 * @var int
+	 * @var string[]
 	 */
-	private $requestsCount = 0;
+	private $requestsCount = [];
 
 	public function __construct(string $host, int $port)
 	{
@@ -184,7 +186,7 @@ class RpcDaemon
 		$return = [];
 
 		foreach ($response->txs as $tx) {
-			$return[] = TransactionData::fromResponse($tx);
+			$return[$tx->tx_hash] = TransactionData::fromResponse($tx);
 		}
 
 		return $return;
@@ -198,10 +200,12 @@ class RpcDaemon
 	 */
 	private function getResponse(string $path, array $body): stdClass
 	{
-		$this->requestsCount++;
+		//$response = $this->getResponseOld($path, $body);
+		$response = $this->getResponseModern($path, $body);
 
-		//return $this->getResponseOld($path, $body);
-		return $this->getResponseModern($path, $body);
+		$this->requestsCount[] = $path;
+
+		return $response;
 	}
 
 	/**
@@ -261,7 +265,10 @@ class RpcDaemon
 		return $responseJson;
 	}
 
-	public function getRequestsCount(): int
+	/**
+	 * @return string[]
+	 */
+	public function getRequestsCount(): array
 	{
 		return $this->requestsCount;
 	}
@@ -271,8 +278,9 @@ class RpcDaemon
 	 * @param mixed[] $body
 	 * @return stdClass
 	 * @throws BadRequestException
+	 * @throws RpcDaemonDownException
 	 */
-	protected function getResponseModern(string $path, array $body): stdClass
+	private function getResponseModern(string $path, array $body): stdClass
 	{
 		$body = Json::encode($body);
 		$options = [
@@ -294,7 +302,12 @@ class RpcDaemon
 			],
 		];
 
-		$response = $this->client->request('GET', $path, $options);
+		try {
+			$response = $this->client->request('GET', $path, $options);
+		} catch (RequestException $e) {
+			throw new RpcDaemonDownException($e->getMessage(), $e->getCode(), $e);
+		}
+
 		$responseJson = Json::decode($response->getBody()->getContents());
 
 		if (isset($responseJson->error) && isset($responseJson->error->message)) {

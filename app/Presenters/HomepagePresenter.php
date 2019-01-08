@@ -5,8 +5,8 @@ namespace App\Presenters;
 use App\Forms\ViewKeyFormFactory;
 use App\Models\RedisStorageService;
 use App\Models\RpcDaemon;
+use App\Models\TransactionData;
 use Nette\Application\BadRequestException;
-use Nette\Application\Responses\JsonResponse;
 use Nette\Application\UI\Form;
 use Nette\Bridges\ApplicationLatte\Template;
 use Nette\Caching\Cache;
@@ -61,10 +61,23 @@ class HomepagePresenter extends BasePresenter
 		}
 
 		$blocks = $this->rpcDaemon->getBlocksByHeight($heightStart, self::ITEMS_PER_PAGE);
+		$txHashes = [];
 
 		foreach ($blocks as $block) {
 			if (\count($block->getTxHashes()) > 0) {
-				$block->setTransactions($this->rpcDaemon->getTransactions($block->getTxHashes()));
+				$txHashes[] = $block->getTxHashes();
+			}
+		}
+
+		if (\count($txHashes) > 0) {
+			$txHashes = $this->rpcDaemon->getTransactions(\array_merge(...$txHashes));
+
+			foreach ($blocks as $block) {
+				if (\count($block->getTxHashes()) > 0) {
+					$block->setTransactions(\array_filter($txHashes, function (string $key) use ($block) {
+						return \in_array($key, $block->getTxHashes(), true);
+					}, \ARRAY_FILTER_USE_KEY));
+				}
 			}
 		}
 
@@ -117,12 +130,14 @@ class HomepagePresenter extends BasePresenter
 	{
 		$this['viewKeyForm']; // fix session problem
 		$transactions = $this->rpcDaemon->getTransactions([$hash], $this->request->getPost('viewKey'));
-		$transaction = $transactions[0]->getData();
+		/** @var TransactionData $transaction */
+		$transaction = \reset($transactions);
+		$transactionStdClass = $transaction->getData();
 		//\dump($transaction);
 		$block = null;
 
-		if ($transaction->in_pool === false) {
-			$block = $this->rpcDaemon->getBlockByHeight((int)$transaction->block_height);
+		if ($transactionStdClass->in_pool === false) {
+			$block = $this->rpcDaemon->getBlockByHeight((int)$transactionStdClass->block_height);
 		}
 
 		//dump($block);
@@ -133,7 +148,7 @@ class HomepagePresenter extends BasePresenter
 		}
 
 		$this->template->block = $block;
-		$this->template->transaction = $transaction;
+		$this->template->transaction = $transactionStdClass;
 	}
 
 	public function createComponentViewKeyForm(): Form
@@ -145,26 +160,9 @@ class HomepagePresenter extends BasePresenter
 		return $this->viewKeyFormFactory->create($onClear);
 	}
 
-	public function renderInfo(): JsonResponse
-	{
-		$infoData = $this->rpcDaemon->getInfo();
-		$lastHeight = $infoData->getHeight() - 1;
-		$block = $this->rpcDaemon->getBlockByHeight($lastHeight);
-
-		$response = [
-			'difficulty' => $infoData->getDifficulty(),
-			'hashRate' => $infoData->getHashRate(),
-			'reward' => $block->getReward(),
-			'dateTime' => $block->getDateTime(),
-			'height' => $lastHeight,
-		];
-
-		$this->sendJson($response);
-	}
-
 	protected function afterRender(): void
 	{
-		\bdump($this->rpcDaemon->getRequestsCount(), 'requests count:');
+		\bdump($this->rpcDaemon->getRequestsCount(), 'requests:');
 		parent::afterRender();
 	}
 }
