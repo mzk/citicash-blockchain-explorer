@@ -67,13 +67,15 @@ class HomepagePresenter extends BasePresenter
 				$txHashes[] = $block->getTxHashes();
 			}
 		}
-		$txHashes = $this->rpcDaemon->getTransactions(array_merge(...$txHashes));
 
-		foreach ($blocks as $block) {
-			if (\count($block->getTxHashes()) > 0) {
-				$block->setTransactions(\array_filter($txHashes, function (string $key) use ($block) {
-					return \in_array($key, $block->getTxHashes());
-				}, \ARRAY_FILTER_USE_KEY));
+		if (\count($txHashes) > 0) {
+			$txHashes = $this->rpcDaemon->getTransactions(array_merge(...$txHashes));
+			foreach ($blocks as $block) {
+				if (\count($block->getTxHashes()) > 0) {
+					$block->setTransactions(\array_filter($txHashes, function (string $key) use ($block) {
+						return \in_array($key, $block->getTxHashes());
+					}, \ARRAY_FILTER_USE_KEY));
+				}
 			}
 		}
 
