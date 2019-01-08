@@ -36,9 +36,9 @@ class RpcDaemon
 	private $curl;
 
 	/**
-	 * @var int
+	 * @var string[]
 	 */
-	private $requestsCount = 0;
+	private $requestsCount = [];
 
 	public function __construct(string $host, int $port)
 	{
@@ -200,10 +200,12 @@ class RpcDaemon
 	 */
 	private function getResponse(string $path, array $body): stdClass
 	{
-		$this->requestsCount++;
+		//$response = $this->getResponseOld($path, $body);
+		$response = $this->getResponseModern($path, $body);
 
-		//return $this->getResponseOld($path, $body);
-		return $this->getResponseModern($path, $body);
+		$this->requestsCount[] = $path;
+
+		return $response;
 	}
 
 	/**
@@ -263,7 +265,10 @@ class RpcDaemon
 		return $responseJson;
 	}
 
-	public function getRequestsCount(): int
+	/**
+	 * @return string[]
+	 */
+	public function getRequestsCount(): array
 	{
 		return $this->requestsCount;
 	}
