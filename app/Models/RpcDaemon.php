@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Models\Exception\RpcDaemonDownException;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Handler\StreamHandler;
 use GuzzleHttp\HandlerStack;
 use Nette\Application\BadRequestException;
@@ -272,7 +274,7 @@ class RpcDaemon
 	 * @return stdClass
 	 * @throws BadRequestException
 	 */
-	protected function getResponseModern(string $path, array $body): stdClass
+	private function getResponseModern(string $path, array $body): stdClass
 	{
 		$body = Json::encode($body);
 		$options = [
@@ -294,7 +296,11 @@ class RpcDaemon
 			],
 		];
 
-		$response = $this->client->request('GET', $path, $options);
+		try {
+			$response = $this->client->request('GET', $path, $options);
+		} catch (RequestException $e) {
+			throw new RpcDaemonDownException($e->getMessage(), $e->getCode(), $e);
+		}
 		$responseJson = Json::decode($response->getBody()->getContents());
 
 		if (isset($responseJson->error) && isset($responseJson->error->message)) {
