@@ -6,7 +6,6 @@ use App\Forms\ViewKeyFormFactory;
 use App\Models\RedisStorageService;
 use App\Models\RpcDaemon;
 use Nette\Application\BadRequestException;
-use Nette\Application\Responses\JsonResponse;
 use Nette\Application\UI\Form;
 use Nette\Bridges\ApplicationLatte\Template;
 use Nette\Caching\Cache;
@@ -156,26 +155,9 @@ class HomepagePresenter extends BasePresenter
 		return $this->viewKeyFormFactory->create($onClear);
 	}
 
-	public function renderInfo(): JsonResponse
-	{
-		$infoData = $this->rpcDaemon->getInfo();
-		$lastHeight = $infoData->getHeight() - 1;
-		$block = $this->rpcDaemon->getBlockByHeight($lastHeight);
-
-		$response = [
-			'difficulty' => $infoData->getDifficulty(),
-			'hashRate' => $infoData->getHashRate(),
-			'reward' => $block->getReward(),
-			'dateTime' => $block->getDateTime(),
-			'height' => $lastHeight,
-		];
-
-		$this->sendJson($response);
-	}
-
 	protected function afterRender(): void
 	{
-		\bdump($this->rpcDaemon->getRequestsCount(), 'requests count:');
+		\bdump($this->rpcDaemon->getRequestsCount(), 'requests:');
 		parent::afterRender();
 	}
 }
