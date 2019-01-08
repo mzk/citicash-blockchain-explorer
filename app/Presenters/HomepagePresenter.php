@@ -117,7 +117,7 @@ class HomepagePresenter extends BasePresenter
 	{
 		$this['viewKeyForm']; // fix session problem
 		$transactions = $this->rpcDaemon->getTransactions([$hash], $this->request->getPost('viewKey'));
-		$transaction = $transactions[0]->getData();
+		$transaction = \reset($transactions)->getData();
 		//\dump($transaction);
 		$block = null;
 
