@@ -186,7 +186,7 @@ class RpcDaemon
 		$return = [];
 
 		foreach ($response->txs as $tx) {
-			$return[] = TransactionData::fromResponse($tx);
+			$return[$tx->tx_hash] = TransactionData::fromResponse($tx);
 		}
 
 		return $return;
