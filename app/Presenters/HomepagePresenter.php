@@ -61,10 +61,19 @@ class HomepagePresenter extends BasePresenter
 		}
 
 		$blocks = $this->rpcDaemon->getBlocksByHeight($heightStart, self::ITEMS_PER_PAGE);
+		$txHashes = [];
+		foreach ($blocks as $block) {
+			if (\count($block->getTxHashes()) > 0) {
+				$txHashes[] = $block->getTxHashes();
+			}
+		}
+		$txHashes = $this->rpcDaemon->getTransactions(array_merge(...$txHashes));
 
 		foreach ($blocks as $block) {
 			if (\count($block->getTxHashes()) > 0) {
-				$block->setTransactions($this->rpcDaemon->getTransactions($block->getTxHashes()));
+				$block->setTransactions(\array_filter($txHashes, function (string $key) use ($block) {
+					return \in_array($key, $block->getTxHashes());
+				}, \ARRAY_FILTER_USE_KEY));
 			}
 		}
 
