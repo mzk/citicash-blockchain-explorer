@@ -132,12 +132,12 @@ class HomepagePresenter extends BasePresenter
 		$transactions = $this->rpcDaemon->getTransactions([$hash], $this->request->getPost('viewKey'));
 		/** @var TransactionData $transaction */
 		$transaction = \reset($transactions);
-		$transaction->getData();
+		$transactionStdClass = $transaction->getData();
 		//\dump($transaction);
 		$block = null;
 
-		if ($transaction->in_pool === false) {
-			$block = $this->rpcDaemon->getBlockByHeight((int)$transaction->block_height);
+		if ($transactionStdClass->in_pool === false) {
+			$block = $this->rpcDaemon->getBlockByHeight((int)$transactionStdClass->block_height);
 		}
 
 		//dump($block);
@@ -148,7 +148,7 @@ class HomepagePresenter extends BasePresenter
 		}
 
 		$this->template->block = $block;
-		$this->template->transaction = $transaction;
+		$this->template->transaction = $transactionStdClass;
 	}
 
 	public function createComponentViewKeyForm(): Form
