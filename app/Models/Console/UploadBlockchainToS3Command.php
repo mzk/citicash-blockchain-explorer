@@ -62,8 +62,13 @@ class UploadBlockchainToS3Command extends BaseCommand
 		$command = '/home/ubuntu/mounted2/citicash-blockchain-export --data-dir /home/ubuntu/mounted2/.citicash --output-file /home/ubuntu/mounted2/blockchain.raw.tmp';
 		$this->runProcess($command);
 
-		$md5sumCommand = 'md5sum /home/ubuntu/mounted2/blockchain.raw.tmp > /home/ubuntu/mounted2/blockchain.raw.md5sum.txt';
-		$this->runProcess($md5sumCommand);
+		$md5 = \md5_file('/home/ubuntu/mounted2/blockchain.raw.tmp', true);
+		$result = \file_put_contents('/home/ubuntu/mounted2/blockchain.raw.md5sum.txt', $md5);
+		if ($result === false) {
+			$output->writeln('fail in write md5sum');
+
+			return 1;
+		}
 
 		$s3Client = new S3Client(
 			[
@@ -78,7 +83,7 @@ class UploadBlockchainToS3Command extends BaseCommand
 		$uploader = new MultipartUploader($s3Client, '/home/ubuntu/mounted2/blockchain.raw.tmp', [
 			'bucket' => 'citicashblockchain',
 			'key' => 'blockchain.raw',
-			'Content-MD5' => $md5sumCommand,
+			'Content-MD5' => \base64_encode($md5),
 		]);
 
 		try {
