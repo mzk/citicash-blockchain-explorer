@@ -68,8 +68,10 @@ class UploadBlockchainToS3Command extends BaseCommand
 		$command = \sprintf('/home/ubuntu/mounted2/citicash-blockchain-export --data-dir /home/ubuntu/mounted2/.citicash --output-file %s', $this->outputBlockchainFileName);
 		$this->runProcess($command);
 
-		$md5 = \md5_file($this->outputBlockchainFileName, true);
+		$md5 = \md5_file($this->outputBlockchainFileName);
+		$sha256 = \hash_file('sha256', $this->outputBlockchainFileName);
 		$output->writeln(\sprintf('computed md5 is %s', $md5));
+		$output->writeln(\sprintf('computed sha256 is %s', $sha256));
 
 		$result = \file_put_contents('/home/ubuntu/mounted2/blockchain.raw.md5sum.txt', $md5);
 		if ($result === false) {
@@ -88,9 +90,10 @@ class UploadBlockchainToS3Command extends BaseCommand
 				'version' => 'latest',
 			]
 		);
+
 		$uploader = new MultipartUploader($s3Client, $this->outputBlockchainFileName, [
-			'bucket' => 'citicashblockchain',
-			'key' => 'blockchain.raw',
+			'Bucket' => 'citicashblockchain',
+			'Key' => 'blockchain2.raw',
 			'Content-MD5' => \base64_encode($md5),
 		]);
 
