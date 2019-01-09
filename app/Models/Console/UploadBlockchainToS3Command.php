@@ -3,7 +3,6 @@
 namespace App\Models\Console;
 
 use Aws\Exception\MultipartUploadException;
-use Aws\S3\MultipartUploader;
 use Aws\S3\S3Client;
 use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Input\InputInterface;
@@ -91,14 +90,17 @@ class UploadBlockchainToS3Command extends BaseCommand
 			]
 		);
 
-		$uploader = new MultipartUploader($s3Client, $this->outputBlockchainFileName, [
-			'Bucket' => 'citicashblockchain',
-			'Key' => 'blockchain2.raw',
-			'Content-MD5' => \base64_encode($md5),
-		]);
-
 		try {
-			$result = $uploader->upload();
+			$result = $s3Client->putObject([
+				'Bucket' => 'citicashblockchain',
+				'Key' => 'blockchain.raw',
+				'Content-MD5' => \base64_encode($md5),
+				'SourceFile' => $this->outputBlockchainFileName,
+				'ContentSHA256' => ($sha256),
+				'Metadata' => [
+					'Content-MD5' => \base64_encode($md5),
+				],
+			]);
 			$output->writeln(\sprintf('Upload complete: %s', $result['ObjectURL']));
 		} catch (MultipartUploadException $e) {
 			$output->writeln($e->getMessage());
