@@ -72,7 +72,7 @@ class UploadBlockchainToS3Command extends BaseCommand
 		$output->writeln(\sprintf('computed md5 is %s', $md5));
 		$output->writeln(\sprintf('computed sha256 is %s', $sha256));
 
-		$result = \file_put_contents('/home/ubuntu/mounted2/blockchain.raw.md5sum.txt', $md5);
+		$result = \file_put_contents('/var/www/blockchain-explorer/www/blockchain.raw.md5sum.txt', $md5 . '  /home/ubuntu/mounted2/blockchain.raw.tmp'); //tmp fix
 
 		if ($result === false) {
 			$output->writeln('fail in write md5sum');
@@ -108,7 +108,7 @@ class UploadBlockchainToS3Command extends BaseCommand
 		}
 
 		$output->writeln('scp');
-		$copyToAnotherCommand = \sprintf('scp /home/ubuntu/mounted2/blockchain.raw.md5sum.txt %s:/home/ubuntu/blockchain.raw.md5sum.txt', $this->citicashIoServer);
+		$copyToAnotherCommand = \sprintf('scp /var/www/blockchain-explorer/www/blockchain.raw.md5sum.txt %s:/home/ubuntu/blockchain.raw.md5sum.txt', $this->citicashIoServer);
 		$this->runProcess($copyToAnotherCommand);
 
 		$this->release();
