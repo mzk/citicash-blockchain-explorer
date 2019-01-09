@@ -69,6 +69,8 @@ class UploadBlockchainToS3Command extends BaseCommand
 		$this->runProcess($command);
 
 		$md5 = \md5_file($this->outputBlockchainFileName, true);
+		$output->writeln(\sprintf('computed md5 is %s', $md5));
+
 		$result = \file_put_contents('/home/ubuntu/mounted2/blockchain.raw.md5sum.txt', $md5);
 		if ($result === false) {
 			$output->writeln('fail in write md5sum');
