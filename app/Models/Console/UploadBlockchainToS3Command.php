@@ -35,12 +35,18 @@ class UploadBlockchainToS3Command extends BaseCommand
 	 */
 	private $output;
 
-	public function __construct(string $s3Key, string $s3Secret, string $citicashIoServer)
+	/**
+	 * @var string
+	 */
+	private $outputBlockchainFileName;
+
+	public function __construct(string $s3Key, string $s3Secret, string $citicashIoServer, string $outputBlockchainFileName)
 	{
 		parent::__construct(null);
 		$this->s3Key = $s3Key;
 		$this->s3Secret = $s3Secret;
 		$this->citicashIoServer = $citicashIoServer;
+		$this->outputBlockchainFileName = $outputBlockchainFileName;
 	}
 
 	protected function configure(): void
@@ -59,10 +65,10 @@ class UploadBlockchainToS3Command extends BaseCommand
 
 		$this->output = $output;
 
-		$command = '/home/ubuntu/mounted2/citicash-blockchain-export --data-dir /home/ubuntu/mounted2/.citicash --output-file /home/ubuntu/mounted2/blockchain.raw.tmp';
+		$command = \sprintf('/home/ubuntu/mounted2/citicash-blockchain-export --data-dir /home/ubuntu/mounted2/.citicash --output-file %s', $this->outputBlockchainFileName);
 		$this->runProcess($command);
 
-		$md5 = \md5_file('/home/ubuntu/mounted2/blockchain.raw.tmp', true);
+		$md5 = \md5_file($this->outputBlockchainFileName, true);
 		$result = \file_put_contents('/home/ubuntu/mounted2/blockchain.raw.md5sum.txt', $md5);
 		if ($result === false) {
 			$output->writeln('fail in write md5sum');
@@ -80,7 +86,7 @@ class UploadBlockchainToS3Command extends BaseCommand
 				'version' => 'latest',
 			]
 		);
-		$uploader = new MultipartUploader($s3Client, '/home/ubuntu/mounted2/blockchain.raw.tmp', [
+		$uploader = new MultipartUploader($s3Client, $this->outputBlockchainFileName, [
 			'bucket' => 'citicashblockchain',
 			'key' => 'blockchain.raw',
 			'Content-MD5' => \base64_encode($md5),

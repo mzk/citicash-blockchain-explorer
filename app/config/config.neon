@@ -1,6 +1,7 @@
 parameters:
 	redis_host: "127.0.0.1"
 	redis_database: 3
+	output_blockchain_file_name: '/home/ubuntu/mounted2/blockchain.raw.tmp'
 
 application:
 	errorPresenter: Error
