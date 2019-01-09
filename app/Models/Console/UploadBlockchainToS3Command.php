@@ -30,6 +30,11 @@ class UploadBlockchainToS3Command extends BaseCommand
 	 */
 	private $citicashIoServer;
 
+	/**
+	 * @var OutputInterface
+	 */
+	private $output;
+
 	public function __construct(string $s3Key, string $s3Secret, string $citicashIoServer)
 	{
 		parent::__construct(null);
@@ -52,20 +57,13 @@ class UploadBlockchainToS3Command extends BaseCommand
 			return 1;
 		}
 
+		$this->output = $output;
+
 		$command = '/home/ubuntu/mounted2/citicash-blockchain-export --data-dir /home/ubuntu/mounted2/.citicash --output-file /home/ubuntu/mounted2/blockchain.raw.tmp';
-		$output->writeln($command);
-		$process = Process::fromShellCommandline($command);
-		$process->run();
+		$this->runProcess($command);
 
-		if ($process->getExitCode() !== 0) {
-			$output->writeln($process->getErrorOutput());
-
-			return $process->getExitCode();
-		}
-
-		$output->writeln('md5sum');
-		$md5sumProcess = Process::fromShellCommandline('md5sum /home/ubuntu/mounted2/blockchain.raw.tmp > /home/ubuntu/mounted2/blockchain.raw.md5sum.txt');
-		$md5sumProcess->run();
+		$md5sumCommand = 'md5sum /home/ubuntu/mounted2/blockchain.raw.tmp > /home/ubuntu/mounted2/blockchain.raw.md5sum.txt';
+		$this->runProcess($md5sumCommand);
 
 		$s3Client = new S3Client(
 			[
@@ -80,6 +78,7 @@ class UploadBlockchainToS3Command extends BaseCommand
 		$uploader = new MultipartUploader($s3Client, '/home/ubuntu/mounted2/blockchain.raw.tmp', [
 			'bucket' => 'citicashblockchain',
 			'key' => 'blockchain.raw',
+			'Content-MD5' => $md5sumCommand,
 		]);
 
 		try {
@@ -90,12 +89,24 @@ class UploadBlockchainToS3Command extends BaseCommand
 		}
 
 		$output->writeln('scp');
-		$copyToAnother = \sprintf('scp /home/ubuntu/mounted2/blockchain.raw.md5sum.txt %s:/home/ubuntu/blockchain.raw.md5sum.txt', $this->citicashIoServer);
-		$copyToAnotherProcess = Process::fromShellCommandline($copyToAnother);
-		$copyToAnotherProcess->run();
+		$copyToAnotherCommand = \sprintf('scp /home/ubuntu/mounted2/blockchain.raw.md5sum.txt %s:/home/ubuntu/blockchain.raw.md5sum.txt', $this->citicashIoServer);
+		$this->runProcess($copyToAnotherCommand);
 
 		$this->release();
 
 		return 0;
+	}
+
+	private function runProcess(string $command): void
+	{
+		$this->output->writeln($command);
+		$process = Process::fromShellCommandline($command);
+		$process->run();
+
+		if ($process->getExitCode() !== 0) {
+			$this->output->writeln($process->getErrorOutput());
+
+			die($process->getExitCode());
+		}
 	}
 }
