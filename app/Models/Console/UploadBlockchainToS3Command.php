@@ -3,7 +3,6 @@
 namespace App\Models\Console;
 
 use Aws\Exception\MultipartUploadException;
-use Aws\S3\MultipartUploader;
 use Aws\S3\S3Client;
 use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Input\InputInterface;
@@ -30,12 +29,23 @@ class UploadBlockchainToS3Command extends BaseCommand
 	 */
 	private $citicashIoServer;
 
-	public function __construct(string $s3Key, string $s3Secret, string $citicashIoServer)
+	/**
+	 * @var OutputInterface
+	 */
+	private $output;
+
+	/**
+	 * @var string
+	 */
+	private $outputBlockchainFileName;
+
+	public function __construct(string $s3Key, string $s3Secret, string $citicashIoServer, string $outputBlockchainFileName)
 	{
 		parent::__construct(null);
 		$this->s3Key = $s3Key;
 		$this->s3Secret = $s3Secret;
 		$this->citicashIoServer = $citicashIoServer;
+		$this->outputBlockchainFileName = $outputBlockchainFileName;
 	}
 
 	protected function configure(): void
@@ -52,20 +62,23 @@ class UploadBlockchainToS3Command extends BaseCommand
 			return 1;
 		}
 
-		$command = '/home/ubuntu/mounted2/citicash-blockchain-export --data-dir /home/ubuntu/mounted2/.citicash --output-file /home/ubuntu/mounted2/blockchain.raw.tmp';
-		$output->writeln($command);
-		$process = Process::fromShellCommandline($command);
-		$process->run();
+		$this->output = $output;
 
-		if ($process->getExitCode() !== 0) {
-			$output->writeln($process->getErrorOutput());
+		$command = \sprintf('/home/ubuntu/mounted2/citicash-blockchain-export --data-dir /home/ubuntu/mounted2/.citicash --output-file %s', $this->outputBlockchainFileName);
+		$this->runProcess($command);
 
-			return $process->getExitCode();
+		$md5 = \hash_file('md5', $this->outputBlockchainFileName);
+		$sha256 = \hash_file('sha256', $this->outputBlockchainFileName);
+		$output->writeln(\sprintf('computed md5 is %s', $md5));
+		$output->writeln(\sprintf('computed sha256 is %s', $sha256));
+
+		$result = \file_put_contents('/var/www/blockchain-explorer/www/blockchain.raw.md5sum.txt', $md5 . '  /home/ubuntu/mounted2/blockchain.raw.tmp'); //tmp fix
+
+		if ($result === false) {
+			$output->writeln('fail in write md5sum');
+
+			return 1;
 		}
-
-		$output->writeln('md5sum');
-		$md5sumProcess = Process::fromShellCommandline('md5sum /home/ubuntu/mounted2/blockchain.raw.tmp > /home/ubuntu/mounted2/blockchain.raw.md5sum.txt');
-		$md5sumProcess->run();
 
 		$s3Client = new S3Client(
 			[
@@ -77,25 +90,42 @@ class UploadBlockchainToS3Command extends BaseCommand
 				'version' => 'latest',
 			]
 		);
-		$uploader = new MultipartUploader($s3Client, '/home/ubuntu/mounted2/blockchain.raw.tmp', [
-			'bucket' => 'citicashblockchain',
-			'key' => 'blockchain.raw',
-		]);
 
 		try {
-			$result = $uploader->upload();
+			$result = $s3Client->putObject([
+				'Bucket' => 'citicashblockchain',
+				'Key' => 'blockchain.raw',
+				'Content-MD5' => \base64_encode($md5),
+				'SourceFile' => $this->outputBlockchainFileName,
+				'ContentSHA256' => $sha256,
+				'Metadata' => [
+					'Content-MD5' => \base64_encode($md5),
+				],
+			]);
 			$output->writeln(\sprintf('Upload complete: %s', $result['ObjectURL']));
 		} catch (MultipartUploadException $e) {
 			$output->writeln($e->getMessage());
 		}
 
 		$output->writeln('scp');
-		$copyToAnother = \sprintf('scp /home/ubuntu/mounted2/blockchain.raw.md5sum.txt %s:/home/ubuntu/blockchain.raw.md5sum.txt', $this->citicashIoServer);
-		$copyToAnotherProcess = Process::fromShellCommandline($copyToAnother);
-		$copyToAnotherProcess->run();
+		$copyToAnotherCommand = \sprintf('scp /var/www/blockchain-explorer/www/blockchain.raw.md5sum.txt %s:/home/ubuntu/blockchain.raw.md5sum.txt', $this->citicashIoServer);
+		$this->runProcess($copyToAnotherCommand);
 
 		$this->release();
 
 		return 0;
+	}
+
+	private function runProcess(string $command): void
+	{
+		$this->output->writeln($command);
+		$process = Process::fromShellCommandline($command);
+		$process->run();
+
+		if ($process->getExitCode() !== 0) {
+			$this->output->writeln($process->getErrorOutput());
+
+			die($process->getExitCode());
+		}
 	}
 }
