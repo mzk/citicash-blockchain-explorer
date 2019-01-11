@@ -120,6 +120,7 @@ class UploadBlockchainToS3Command extends BaseCommand
 	{
 		$this->output->writeln($command);
 		$process = Process::fromShellCommandline($command);
+		$process->setTimeout(120);
 		$process->run();
 
 		if ($process->getExitCode() !== 0) {
