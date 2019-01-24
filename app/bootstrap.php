@@ -33,6 +33,8 @@ $configurator->createRobotLoader()
 $configurator->addConfig(__DIR__ . '/config/config.neon');
 $configurator->addConfig(__DIR__ . '/config/config.local.neon');
 
+Debugger::enable(!$debugMode, __DIR__ . '/../var/log', 'salek@citicash.io');
+
 \set_error_handler(function (int $severity, string $message, string $file, int $line): void {
 	if (!(\error_reporting() & $severity)) { // This error code is not included in error_reporting
 
