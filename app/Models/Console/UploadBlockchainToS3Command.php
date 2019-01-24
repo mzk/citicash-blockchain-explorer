@@ -126,6 +126,7 @@ class UploadBlockchainToS3Command extends BaseCommand
 			$this->release();
 			$output->writeln($e->getMessage());
 			Debugger::log($e);
+
 			throw $e;
 		}
 
