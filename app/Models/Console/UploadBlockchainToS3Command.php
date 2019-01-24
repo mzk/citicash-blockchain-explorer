@@ -8,6 +8,7 @@ use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
+use Tracy\Debugger;
 
 class UploadBlockchainToS3Command extends BaseCommand
 {
@@ -104,6 +105,7 @@ class UploadBlockchainToS3Command extends BaseCommand
 			]);
 			$output->writeln(\sprintf('Upload complete: %s', $result['ObjectURL']));
 		} catch (MultipartUploadException $e) {
+			Debugger::log($e);
 			$output->writeln($e->getMessage());
 		}
 
