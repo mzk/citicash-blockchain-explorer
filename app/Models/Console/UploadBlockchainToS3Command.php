@@ -104,14 +104,15 @@ class UploadBlockchainToS3Command extends BaseCommand
 				],
 			]);
 			$output->writeln(\sprintf('Upload complete: %s', $result['ObjectURL']));
+
+			$output->writeln('scp');
+			$copyToAnotherCommand = \sprintf('scp /var/www/blockchain-explorer/www/blockchain.raw.md5sum.txt %s:/home/ubuntu/blockchain.raw.md5sum.txt', $this->citicashIoServer);
+			$this->runProcess($copyToAnotherCommand);
+
 		} catch (MultipartUploadException $e) {
 			Debugger::log($e);
 			$output->writeln($e->getMessage());
 		}
-
-		$output->writeln('scp');
-		$copyToAnotherCommand = \sprintf('scp /var/www/blockchain-explorer/www/blockchain.raw.md5sum.txt %s:/home/ubuntu/blockchain.raw.md5sum.txt', $this->citicashIoServer);
-		$this->runProcess($copyToAnotherCommand);
 
 		$this->release();
 
