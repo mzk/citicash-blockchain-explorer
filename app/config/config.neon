@@ -13,6 +13,7 @@ tracy:
 	maxLength: 999
 	maxDepth: 10
 	showLocation: true
+	email: salek@citicash.io
 
 session:
 	autoStart: false
