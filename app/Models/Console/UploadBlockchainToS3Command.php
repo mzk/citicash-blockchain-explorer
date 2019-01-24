@@ -65,6 +65,7 @@ class UploadBlockchainToS3Command extends BaseCommand
 
 			return 1;
 		}
+
 		$skipExport = (bool)$input->getArgument('skip-export');
 
 		$this->output = $output;
