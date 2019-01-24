@@ -31,7 +31,7 @@
 		"ext-curl": "*",
 		"kdyby/redis": "^4.0@dev",
 		"symfony/console": "^4.3@dev",
-		"aws/aws-sdk-php": "^3.0@dev",
+		"aws/aws-sdk-php": "dev-master",
 		"symfony/process": "^4.3@dev",
 		"symfony/lock": "^4.3@dev"
 	},
