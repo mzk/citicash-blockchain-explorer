@@ -114,16 +114,45 @@ class UploadBlockchainToS3Command extends BaseCommand
 			$result = $uploader->upload();
 			$output->writeln(\sprintf('Upload complete: %s', $result['ObjectURL']));
 
-			// add md5 content
-			$s3Client->putObject([
-				'Bucket' => 'citicashblockchain',
-				'Key' => 'blockchain.raw',
+
+			$uploader = new MultipartCopy($s3Client, 'citicashblockchain/blockchain2.raw', [
+				'bucket' => 'citicashblockchain',
+				'key' => 'blockchain2.raw',
+				'CopySource' => urlencode('citicashblockchain/blockchain2.raw'),
+				'MetadataDirective' => 'REPLACE',
+				'before_initiate' => function (\Aws\Command $command) use ($md5): void {
+					// $command is a CompleteMultipartUpload operation
+					$command['RequestPayer'] = 'requester';
+					$command['Metadata'] = [
+						'Content-MD5' => \base64_encode($md5),
+					];
+				},
 				'Content-MD5' => \base64_encode($md5),
-				'Metadata' => [
+				//'SourceFile' => $this->outputBlockchainFileName,
+				'ContentSHA256' => $sha256,
+				'x-amz-meta-sdf' => 'sdfsdf',
+				'Metadata' => [ //not supported!!
+					'x-amz-meta-sdf' => 'sdfsdf',
 					'Content-MD5' => \base64_encode($md5),
+					'foooo-MD5' => \base64_encode($md5),
 				],
 			]);
 
+			//$uploader->copy();
+
+			// add md5 content
+//			$s3Client->copyObject([
+//				'Bucket' => 'citicashblockchain',
+//				'Key' => 'blockchain2.raw',
+//				'CopySource' => urlencode('citicashblockchain/blockchain.raw'),
+//				'MetadataDirective' => 'REPLACE',
+//				'Content-MD5' => \base64_encode($md5),
+//				'Metadata' => [
+//					'Content-MD5' => \base64_encode($md5),
+//				],
+//			]);
+
+			return 0;
 			$output->writeln('scp');
 			$copyToAnotherCommand = \sprintf('scp /var/www/blockchain-explorer/www/blockchain.raw.md5sum.txt %s:/home/ubuntu/blockchain.raw.md5sum.txt', $this->citicashIoServer);
 			$this->runProcess($copyToAnotherCommand);
