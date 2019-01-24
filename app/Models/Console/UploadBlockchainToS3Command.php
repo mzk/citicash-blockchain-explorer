@@ -6,6 +6,7 @@ use Aws\Exception\MultipartUploadException;
 use Aws\S3\MultipartUploader;
 use Aws\S3\S3Client;
 use Symfony\Component\Console\Command\LockableTrait;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
@@ -54,6 +55,7 @@ class UploadBlockchainToS3Command extends BaseCommand
 	{
 		parent::configure();
 		$this->setName('upload-to-s3');
+		$this->addArgument('skip-export', InputArgument::OPTIONAL, 'skip blockchain export');
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output): ?int
@@ -63,11 +65,14 @@ class UploadBlockchainToS3Command extends BaseCommand
 
 			return 1;
 		}
+		$skipExport = (bool)$input->getArgument('skip-export');
 
 		$this->output = $output;
 
-		$command = \sprintf('/home/ubuntu/mounted2/citicash-blockchain-export --data-dir /home/ubuntu/mounted2/.citicash --output-file %s', $this->outputBlockchainFileName);
-		$this->runProcess($command);
+		if ($skipExport === false) {
+			$command = \sprintf('/home/ubuntu/mounted2/citicash-blockchain-export --data-dir /home/ubuntu/mounted2/.citicash --output-file %s', $this->outputBlockchainFileName);
+			$this->runProcess($command);
+		}
 
 		$md5 = \hash_file('md5', $this->outputBlockchainFileName);
 		$sha256 = \hash_file('sha256', $this->outputBlockchainFileName);
