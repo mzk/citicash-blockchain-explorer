@@ -99,7 +99,7 @@ class UploadBlockchainToS3Command extends BaseCommand
 			'Content-MD5' => \base64_encode($md5),
 			'SourceFile' => $this->outputBlockchainFileName,
 			'ContentSHA256' => $sha256,
-			'Metadata' => [
+			'Metadata' => [ //not supported!!
 				'Content-MD5' => \base64_encode($md5),
 			],
 		]);
@@ -107,6 +107,16 @@ class UploadBlockchainToS3Command extends BaseCommand
 		try {
 			$result = $uploader->upload();
 			$output->writeln(\sprintf('Upload complete: %s', $result['ObjectURL']));
+
+			// add md5 content
+			$s3Client->putObject([
+				'Bucket' => 'citicashblockchain',
+				'Key' => 'blockchain.raw',
+				'Content-MD5' => \base64_encode($md5),
+				'Metadata' => [
+					'Content-MD5' => \base64_encode($md5),
+				],
+			]);
 
 			$output->writeln('scp');
 			$copyToAnotherCommand = \sprintf('scp /var/www/blockchain-explorer/www/blockchain.raw.md5sum.txt %s:/home/ubuntu/blockchain.raw.md5sum.txt', $this->citicashIoServer);
